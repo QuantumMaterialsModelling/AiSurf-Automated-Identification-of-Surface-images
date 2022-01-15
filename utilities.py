@@ -128,7 +128,7 @@ def plot_clusters(img, kps, labels, colormap='jet', **kwargs):
     labels - array. Integers labelling each keypoint.
     
     Output:
-    None. img+keypoints are plotted.
+    None. Img+keypoints are plotted.
     """
     #get coordinates and sizes of all keypoints
     x,y,sizes = getXYSfromKPS(kps)
@@ -139,7 +139,6 @@ def plot_clusters(img, kps, labels, colormap='jet', **kwargs):
     ax = plt.gca()
     plt.imshow(img, cmap=get_correctGreyCmap("Grey_cmap"), vmin=0, vmax=255)
     
-
     for i in range(len(set(labels))):
         c = np.array(cmap(i))
         for k in range(np.size(kps)):
@@ -184,11 +183,11 @@ def kNearestNeighbours(x, k, eps=0):
     -----------
     Input:
     x - array with shape (N,m). N is number of points and m is dimension (2 = x,y coord.).
-        contains the keypoint's coordinates.
+        Contains the keypoint's coordinates.
     k - int. Number of nearest neighbors to calculate the difference vectors.
 
     Output:
-    KNN - array with shape (dim(x)*k,2). Distances of the k-nearest-neighbours from any x[i].
+    KNN - array with shape (len(x)*k,2). Distances of the k-nearest-neighbours from any x[i].
     '''
     N,m = np.shape(x)
     if k >= N:
