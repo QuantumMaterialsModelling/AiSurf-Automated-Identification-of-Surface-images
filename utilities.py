@@ -197,7 +197,7 @@ def kNearestNeighbours(x, k, eps=0):
         k = N-1
     kNN = np.array([])
     for i in range(N):
-        #for every x check 6 NN that are nonzero    
+        #for every x check k-NN that are nonzero    
         dist = np.linalg.norm(-x+x[i,:], axis=1)
         sort_i = np.argsort(dist)
         dist = np.take_along_axis(dist, sort_i, axis=0)
@@ -338,7 +338,7 @@ def plot_grid(start, a, b, **kwargs):
     plt.legend()
 
     
-######################################################################
+#### Old unused function
 def create_configfile(configfilepath,
                         inputfile,                               # Input
                         cThr, sigma, nOctLayers,                 # SIFT
