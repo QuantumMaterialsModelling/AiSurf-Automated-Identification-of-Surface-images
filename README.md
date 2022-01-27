@@ -6,7 +6,11 @@ The main advantage of LYRE is that it exploits unsupervised machine learning tec
 ## Installation
 No installation is needed, the user just needs to download this repository. 
 ### Dependencies
-...
+* NumPy
+* Matplotlib
+* SciPy
+* Scikit-learn (sklearn)
+* Python Image Library (PIL)
 
 
 ## Usage
@@ -49,7 +53,7 @@ Once the primitive vectors have been found, we look for the sublattice positions
 
 [*Deviation plot*] <br>
 Parameters related to the perfect-lattice-deviations plot. RIVEDI QUESTA PARTE
-- **k2**: number of nearest neighbors considered for each keypoint. *Default: 20*;
+- **k2**: number of nearest neighbors considered for each keypoint. *Default: 10*;
 - **rtol_rel**: all vectors that are within the relative_r-tolerance of the lattice vectors are drawn; *Default: 4*.
 - **arrow_width**: the arrow_width can be specified (see [matplotlib.quiver() - width parameter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html)). *Default: 0.003*.
 
@@ -57,15 +61,15 @@ Parameters related to the perfect-lattice-deviations plot. RIVEDI QUESTA PARTE
 
 
 ## Example
-SrTiO$_3$ (001) with Sr vacancies, calculated with the default parameters written above: <br>
+SrTiO*<sub>3* (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-![clean_kp](experiments/small SrTiO3_1244/example_cleankp.png)
+![clean_kp](experiments/small_SrTiO3_1244/example_cleankp.png)
 <br> Nearest neighbours distances folded into the unit cell: <br>
-![sublattice_pos](experiments/small SrTiO3_1244/sublattice_positions.svg)
-<br> Arrows connecting Sr atoms, coloured on their deviation from the primitive vector: <br>
-![deviations](experiments/small SrTiO3_1244/example_deviations.svg)
+![sublattice_pos](experiments/small_SrTiO3_1244/sublattice_positions.svg)
+<br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
+![deviations](experiments/small_SrTiO3_1244/example_deviations.svg)
 <br> Final prediction of the cell symmetry: <br>
-![symmetry](experiments/small SrTiO3_1244/example_cell_symmetry.svg)
+![symmetry](experiments/small_SrTiO3_1244/example_cell_symmetry.svg)
 
 
 
