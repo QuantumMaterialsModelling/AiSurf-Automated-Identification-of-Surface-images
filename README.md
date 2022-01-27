@@ -63,13 +63,13 @@ Parameters related to the perfect-lattice-deviations plot. RIVEDI QUESTA PARTE
 ## Example
 SrTiO*<sub>3* (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-![clean_kp](experiments/small_SrTiO3_1244/example_cleankp.png)
+![clean_kp](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small%20SrTiO3_1244/example_cleankp.png)
 <br> Nearest neighbours distances folded into the unit cell: <br>
-![sublattice_pos](experiments/small_SrTiO3_1244/sublattice_positions.svg)
+![sublattice_pos](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small%20SrTiO3_1244/sublattice_positions.svg)
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-![deviations](experiments/small_SrTiO3_1244/example_deviations.svg)
+![deviations](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small%20SrTiO3_1244/example_deviations.svg)
 <br> Final prediction of the cell symmetry: <br>
-![symmetry](experiments/small_SrTiO3_1244/example_cell_symmetry.svg)
+![symmetry](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_20SrTiO3_1244/example_cell_symmetry.svg)
 
 
 
