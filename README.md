@@ -52,7 +52,7 @@ Once the primitive vectors have been found, we look for the sublattice positions
 - **clustering_span_SUBL**: interval containing the optimal number of sublattice positions. *Default: interval from 2 to 10*.
 
 [*Deviation plot*] <br>
-Parameters related to the perfect-lattice-deviations plot. RIVEDI QUESTA PARTE
+Parameters related to the perfect-lattice-deviations plot.
 - **k2**: number of nearest neighbors considered for each keypoint. *Default: 10*;
 - **rtol_rel**: all vectors that are within the relative_r-tolerance of the lattice vectors are drawn; *Default: 4*.
 - **arrow_width**: the arrow_width can be specified (see [matplotlib.quiver() - width parameter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html)). *Default: 0.003*.
@@ -63,13 +63,13 @@ Parameters related to the perfect-lattice-deviations plot. RIVEDI QUESTA PARTE
 ## Example
 SrTiO*<sub>3* (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-![clean_kp](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small%20SrTiO3_1244/example_cleankp.png)
+![clean_kp](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_cleankp.png)
 <br> Nearest neighbours distances folded into the unit cell: <br>
-![sublattice_pos](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small%20SrTiO3_1244/sublattice_positions.svg)
+![sublattice_pos](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/sublattice_positions.svg)
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-![deviations](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small%20SrTiO3_1244/example_deviations.svg)
+![deviations](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_deviations.svg)
 <br> Final prediction of the cell symmetry: <br>
-![symmetry](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_20SrTiO3_1244/example_cell_symmetry.svg)
+![symmetry](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_cell_symmetry.svg)
 
 
 
