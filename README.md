@@ -39,17 +39,18 @@ These are thresholds to filter out [keypoints](https://paperswithcode.com/task/k
 
 [*Keypoint Clustering*] <br>
 Clusterings with *n* clusters between lower and upper bound are evaluated with respect to their [silhouette score](https://towardsdatascience.com/silhouette-coefficient-validating-clustering-techniques-e976bb81d10c); the one with the maximal silhouette score is chosen for further processing.
-- **clustering_span_kp**: interval containing the optimal number of different clusters found in the image, evaluated by calculating the silhouette score. *Default: interval from 2 to 14*.
+- **clustering_span_kp**: interval containing the optimal number of different clusters found in the image, evaluated by calculating the silhouette score. *Default: interval from 2 to 12*.
+- **cluster_choice**: number that selects the chosen reference cluster for the second part of the analysis. The value of *1* indicates the *First*/*most populated cluster*, so *2* selects the *second* most populated and so on. *Default: 1*.
 
 [*Nearest Neighbours*] <br>
 Parameters related to the clustering processes used to find the primitive vectors.
 - **k1**: the number of nearest neighbors considered for each keypoint. For each keypoint, the *k1* shortest distances will be taken into account. *Default: 6*;
-- **cluster_span_kNN**: interval containing the optimal number of nearest neighbors, evaluated by calculating the silhouette score. *Default: interval from k1 to 4\*k1*. 
+- **cluster_span_kNN**: interval containing the optimal number of clusters for the calculated NN distances, evaluated by the silhouette score. *Default: interval from k1 to 4\*k1*. 
 - **clustersize_Threshold**: used to reduce impact of erroneous nn-vectors on the selection of the lattice vectors. In the final distribution only nn-clusters with population ≥ clustersize_threshold\*n_max are considered; n_max here is the population of the largest cluster; *Default: 0.3*.
 
 [*Sublattice lookup*] <br>
 Once the primitive vectors have been found, we look for the sublattice positions. K-means clustering algorithm is used.
-- **clustering_span_SUBL**: interval containing the optimal number of sublattice positions. *Default: interval from 2 to 10*.
+- **clustering_span_SUBL**: interval containing the optimal number of sublattice positions. *Default: interval from 2 to 6*.
 
 [*Deviation plot*] <br>
 Parameters related to the perfect-lattice-deviations plot.
@@ -61,7 +62,7 @@ Parameters related to the perfect-lattice-deviations plot.
 
 
 ## Example
-SrTiO*<sub>3* (001) with Sr vacancies, calculated with the default parameters written above: <br>
+SrTiO*<sub>3* !!!RISOLVI!!! (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
 ![clean_kp](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_cleankp.png)
 <br> Nearest neighbours distances folded into the unit cell: <br>
