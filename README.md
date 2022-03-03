@@ -40,7 +40,7 @@ These are thresholds to filter out [keypoints](https://paperswithcode.com/task/k
 [*Keypoint Clustering*] <br>
 Clusterings with *n* clusters between lower and upper bound are evaluated with respect to their [silhouette score](https://towardsdatascience.com/silhouette-coefficient-validating-clustering-techniques-e976bb81d10c); the one with the maximal silhouette score is chosen for further processing.
 - **clustering_span_kp**: interval containing the optimal number of different clusters found in the image, evaluated by calculating the silhouette score. *Default: interval from 2 to 12*.
-- **cluster_choice**: number that selects the chosen reference cluster for the second part of the analysis. The value of *1* indicates the *First*/*most populated cluster*, so *2* selects the *second* most populated and so on. *Default: 1*.
+- **cluster_choice**: number that selects the chosen reference cluster for the second part of the analysis. The value of *1* indicates the *first*/*most populated cluster*, so *2* selects the *second* most populated one and so on. *Default: 1*.
 
 [*Nearest Neighbours*] <br>
 Parameters related to the clustering processes used to find the primitive vectors.
