@@ -1,22 +1,131 @@
 '''
 UTILITIES AND PLOTTING
 ---------
-
-These are all the functions thatget some job done without leading to a deeper
-understanding of the overall method.
-
+Functions used in the notebook.
 ---------
 '''
 import re
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as cv
-from sklearn.cluster import DBSCAN
+import scipy as sp
 import matplotlib as mpl
+from matplotlib.colors import NoNorm
 import configparser
 from sklearn.cluster import AgglomerativeClustering, KMeans
 from sklearn.metrics import silhouette_score
+from PIL import Image, ImageDraw
+import matplotlib.patches as patches
 
+
+def find_best_clustering(descriptors, span, sklearn_clustering=AgglomerativeClustering, **kwargs):
+    '''
+    Finds the optimal number of clusters of the given descriptors
+    with respect to the silhouette score.
+    
+    Parameters:
+    -----------
+    descriptors - array of size (n,d), for n features with d descriptors;
+    span - a range of values where the optimal number of clusters should be.
+    **kwargs - additional possible arguments for AgglomerativeClustering.
+    
+    Result:
+    -------
+    best_labels - for each descriptor returns a label specifying the described
+                  features cluster.
+    '''
+    max_SC = 0 #max score
+    labels = np.zeros(np.shape(descriptors)[0])
+    for N in span:
+        clustering = sklearn_clustering(n_clusters=N, **kwargs).fit(descriptors)
+        labels = clustering.labels_
+        sil_score = silhouette_score(descriptors, labels)
+        if sil_score > max_SC:
+            best_labels = labels #each keypoint has an integer specifying its cluster
+            max_SC = sil_score
+    print("Maximal silhouette score found with {} clusters:\nsil_score = {}"
+          .format(max(set(best_labels))+1, max_SC))
+    return best_labels
+
+
+def dist_per(u, v, a, b):
+    '''
+    Calculates distances in a 1x1 unit cell with periodic boundary conditions.
+    
+    Parameters:
+    ----------    
+    Input:
+    u, v - arrays. Two points which distance is to be calculated.
+    a, b - arrays. Coordinates of the lattice vectors.
+    
+    Output:
+    d - float. Distance.      
+    '''
+    deltax = np.abs(u - v)
+    d = np.sqrt(\
+            np.sum(\
+             np.matmul(np.array([a,b]).T,
+                    np.amin(\
+                        np.array([deltax, 1-deltax])\
+                        ,axis=0))**2\
+            )\
+        )
+    return d
+
+
+def COM(x):
+    '''
+    Calculates the average position of each cluster (Center Of Mass)
+    following COM calculation by Linge Bai and David Breen:
+    "Calculating Center of Mass in an Unbounded 2D environment".
+    
+    Parameters:
+    ----------    
+    Input:
+    x - array. Coordinates of keypoints belonging to the same cluster.
+    
+    Output:
+    COM - array. Cordinates of the center of mass.
+    '''
+    
+    N,k = np.shape(x)
+    COM = np.zeros(2)
+    ri = 1/(2*np.pi)
+    #first component:
+    theta_i = x[:,0]*2*np.pi
+    x1 = np.zeros((N,3))
+    x1[:,0] = ri*np.cos(theta_i)
+    x1[:,1] = x[:,1]
+    x1[:,2] = ri*np.sin(theta_i)
+    X_bar = np.average(x1, axis=0)
+    if np.abs(X_bar[0]) >= 0.001 and np.abs(X_bar[2])>=0.001:
+        theta = np.arctan2(-X_bar[2],-X_bar[0])+np.pi
+    else:
+        theta = 0
+    COM[0] = ri*theta
+    #second component:
+    theta_i = x[:,1]/ri
+    x1[:,0] = x[:,0]
+    x1[:,1] = ri*np.cos(theta_i)
+    x1[:,2] = ri*np.sin(theta_i)
+    X_bar = np.average(x1,axis=0)
+    if np.abs(X_bar[0]) >= 0.001 and np.abs(X_bar[2])>=0.001:
+        theta = np.arctan2(-X_bar[2], -X_bar[1])+np.pi
+    else:
+        theta = 0
+    COM[1] = ri*theta
+    return COM
+
+def Rot_matrix(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array(((c, -s), (s, c)))
+
+def Apply_PBC(a_vec, b_vec, point):
+    basis_matrix = np.array([[a_vec[0], b_vec[0]], [a_vec[1], b_vec[1]]])
+    trf = np.linalg.solve(basis_matrix, point)
+    trf[0] -= round(trf[0])
+    trf[1] -= round(trf[1])
+    return np.dot(basis_matrix, trf)
 
 def unit_vector(vector):
     """ Normalizes a given vector.  """
@@ -135,7 +244,7 @@ def plot_clusters(img, kps, labels, colormap='jet', **kwargs):
 
     #plot background image
     cmap = plt.get_cmap(colormap,len(set(labels)))
-    fig =plt.figure(figsize=(7,7), dpi=80)
+    fig = plt.figure(figsize=(7,7), dpi=80)
     ax = plt.gca()
     plt.imshow(img, cmap=get_correctGreyCmap("Grey_cmap"), vmin=0, vmax=255)
     
@@ -145,7 +254,7 @@ def plot_clusters(img, kps, labels, colormap='jet', **kwargs):
             if labels[k]==i:
                 ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
 
-
+                
 def plot_one_cluster(img, kps, labels, cluster_label, colormap="jet",**kwargs):
     """
     Plots on top of the image the keypoints of the requested label.
@@ -166,13 +275,44 @@ def plot_one_cluster(img, kps, labels, cluster_label, colormap="jet",**kwargs):
 
     #plot background image
     cmap = plt.get_cmap(colormap,len(set(labels)))
-    plt.imshow(img,cmap=get_correctGreyCmap("Grey_cmap"),vmin=0,vmax=255)
+    plt.imshow(img, cmap=get_correctGreyCmap("Grey_cmap"), vmin=0, vmax=255)
     ax = plt.gca()
     c = np.array(cmap(cluster_label))
     for k in range(np.size(kps)):
         if labels[k]==cluster_label:
             ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
 
+
+def clusters_selector(kps, labels, chosen_labels): #not used anymore
+    '''
+    Allows to filter the keypoints based on the cluster label. Useful for visualising clusters 
+    belonging to features of interest when combined with a plotting function.
+    
+    Parameters:
+    -----------
+    Input:
+    kps - tuple. Keypoints, obtained through cv2.xfeatures2d.SIFT_create(...).detect(...).
+    labels - array. Integers labelling each keypoint.
+    chosen_labels - list. It contains the labels i want to select.
+    
+    Output:
+    kps_filtered - tuple or array?. Filtered keypoints.
+    labels_filtered - array. Filtered labels.
+    '''
+    kps_filtered = []
+    labels_filtered = []
+    for j in range(len(labels)):
+        for i in chosen_labels:     
+            if labels[j] == i:
+                #del kps_filtered[j]
+                kps_filtered.append(kps[j])
+                labels_filtered.append(labels[j])
+                
+    kps_filtered = tuple(kps_filtered)
+    labels_filtered = np.array(labels_filtered)
+            
+    return kps_filtered, labels_filtered   
+            
             
 def kNearestNeighbours(x, k, eps=0):
     '''
@@ -233,6 +373,116 @@ def plot_clustered_NNVs(kNN_right, kNN_labels, kNN_red, a, b):
     plt.arrow(0,0,b[0],b[1])
 
     
+def plot_lattice_deviations(x, a, b, subl_labels, k, rtol_rel, path,
+                             arrow_width, img, colorsmin, colorsmax):
+    '''
+    As a final result plot the kNN-vectors from their respective keypoint,
+    colored by how much they deviate from the found lattice vectors.
+    It uses a "rtol_rel" threshold to decide which kNN's to plot.
+    '''
+    kNN = kNearestNeighbours(x, k)
+    gray_cmap = get_correctGreyCmap("greyscale")
+    
+    plt.figure(figsize=(8,8), dpi=80)
+    plt.axis("equal")
+    plt.gca().invert_yaxis()
+    plt.title('NN to consider in the deviation plot')
+    plt.scatter(kNN[:,0], kNN[:,1], s=1)
+    ax = plt.gca()
+    ax.add_patch(patches.Circle(a, radius=rtol_rel, fill=False, color=(0,0,0)))
+    ax.add_patch(patches.Circle(b, radius=rtol_rel, fill=False, color=(0,0,0)))
+    ax.add_patch(patches.Circle(-b, radius=rtol_rel, fill=False, color=(0,0,0)))
+    ax.add_patch(patches.Circle(-a, radius=rtol_rel, fill=False, color=(0,0,0)))
+    plt.arrow(0, 0, a[0], a[1])
+    plt.arrow(0, 0, b[0], b[1])
+    plt.arrow(0, 0, -a[0], -a[1])
+    plt.arrow(0, 0, -b[0], -b[1])
+    plt.show()
+    
+    diff = []
+    # Consistent coloring of arrows across quiver plots:
+    quivernorm = mpl.colors.Normalize(vmin=colorsmin, vmax=colorsmax, clip=True)
+    for s in set(subl_labels):
+        # I want to plot the NN-vectors for each sublattice
+        # for that I need proper masks to seperate the sublattices out of x and kNN
+        isinSubl = subl_labels == s
+        kNNofSubl = isinSubl.repeat(k)
+        
+        print('Sublattice {}:'.format(s))
+        fig = plt.figure(figsize=(4,4), dpi=160)
+        plt.imshow(img, cmap=gray_cmap, norm=NoNorm())
+        plt.axis("off")
+
+        # Plot all NN-vectors that belong to the FIRST basis vector:
+        is_a = (np.linalg.norm(kNN-a, axis=1) <= rtol_rel) 
+        is_minus_a = (np.linalg.norm(kNN+a, axis=1) <= rtol_rel)
+        to_draw = kNNofSubl & (is_a | is_minus_a)
+        kp_inds1 = np.where(to_draw)[0]//k
+        kps1 = np.take(x, kp_inds1, axis=0)
+        
+        diff = np.append(diff, kNN[is_a & kNNofSubl,:]-a)
+        diff = np.append(diff, kNN[is_minus_a & kNNofSubl,:]+a)
+        diff_magn = np.zeros(np.shape(kNN[to_draw,:])[0])
+        
+        for i in range(np.shape(kNN[to_draw,:])[0]):
+            if (is_a[to_draw])[i]:
+                diff_magn[i] = np.linalg.norm((kNN[to_draw,:])[i,:]-a)
+            elif (is_minus_a[to_draw])[i]:
+                diff_magn[i] = np.linalg.norm((kNN[to_draw,:])[i,:]+a)
+        quiv1 = plt.quiver(kps1[:,0], kps1[:,1], kNN[to_draw,0], kNN[to_draw,1],
+                           diff_magn, cmap = "plasma", scale_units="xy", angles="xy", scale=1,
+                           width=arrow_width, norm=quivernorm)
+        diff_magn_a = diff_magn # needed for the histograms
+
+        # Plot all NN-vectors that belong to the SECOND basis vector:
+        is_b = (np.linalg.norm(kNN-b, axis=1) <= rtol_rel)
+        is_minus_b = (np.linalg.norm(kNN+b, axis=1) <= rtol_rel)
+        to_draw = (is_b | is_minus_b) & kNNofSubl
+        kp_inds1 = np.where(to_draw)[0]//k
+        kps1 = np.take(x, kp_inds1, axis=0)
+        
+        diff = np.append(diff, kNN[is_b & kNNofSubl,:]-b)
+        diff = np.append(diff, kNN[is_minus_b & kNNofSubl,:]+b)
+        
+        diff_magn = np.zeros(np.shape(kNN[to_draw,:])[0])
+        for i in range(np.shape(kNN[to_draw,:])[0]):
+            if (is_b[to_draw])[i]:
+                diff_magn[i] = np.linalg.norm((kNN[to_draw,:])[i,:]-b)
+            elif (is_minus_b[to_draw])[i]:
+                diff_magn[i] = np.linalg.norm((kNN[to_draw,:])[i,:]+b)
+        quiv1 = plt.quiver(kps1[:,0], kps1[:,1], kNN[to_draw,0], kNN[to_draw,1],
+                           diff_magn, cmap="plasma", scale_units="xy", angles="xy", scale=1,
+                          width=arrow_width, norm=quivernorm)
+        ax2 = plt.gca()
+        cax = fig.add_axes([ax2.get_position().x1+0.04, ax2.get_position().y0, 0.04,
+                            ax2.get_position().height], label="colorbar")
+        cbar = plt.colorbar(quiv1, cax=cax)
+        cbar.set_label("Deviation from avg. lattice vectors [px]")
+        #plt.title("Deviation of NN-vectors from average lattice vector\nsublattice {}".format(s))
+        plt.savefig(path+"deviations_{}.svg".format(s))
+        plt.show()
+        
+        # Histograms
+        fig, ax = plt.subplots()
+        plt.title("Bond deviation distributions, sublattice {}".format(s))
+        ax.hist(diff_magn_a, rwidth = 0.2, bins = 8, label='a')
+        ax.hist(diff_magn, rwidth = 0.2, bins = 8, label='b')
+        plt.legend()
+        plt.show()
+
+    diff = diff.reshape(np.size(diff)//2, 2)
+
+    plt.figure(figsize=(8,8), dpi=80)
+    plt.axis("equal")
+    plt.gca().invert_yaxis()
+    plt.title("Distribution of deviations from primitive lattice vectors")
+    plt.xlabel("x [px]")
+    plt.ylabel("y [px]")
+    plt.scatter(diff[:,0], diff[:,1], s=1)
+    plt.savefig(path+"deviations.svg")
+    plt.show()    
+    
+    
 def DensityClustering(x, rtol, mins=3):
     '''
     Use DBSCAN algorithm to cluster a (potentially noisy) list of vectors.
@@ -261,6 +511,180 @@ def DensityClustering(x, rtol, mins=3):
     return unique, labels
 
 
+# Average cell-rrlated functions
+
+def average_cell(img, a, b, x, subl_labels, center_atom_cluster, lengthener):
+    '''
+    Uses the original image, the unit vectors, and the chosen sublattice 
+    and returns the mean and average cells.
+    '''
+    # With lengthener 1 only the unit cells are averaged and displayed.
+    # With lengthener = 2 the average is done with twice as long unit vectors 
+    # leading to the the surrounding area being included in the average.
+
+    orig_img = img
+    coordinates = x[subl_labels == center_atom_cluster]
+
+    display_points = np.zeros((len(coordinates), 4, 2)).tolist()  # Only for plotting
+
+    for i in range(len(coordinates)):
+        kp_x = int(round(coordinates[i][0]))
+        kp_y = int(round(coordinates[i][1]))
+
+        display_points[i][0][0] = int(
+            kp_x + round((a[0] + b[0]) * 0.5 * lengthener)
+        )
+        display_points[i][0][1] = int(
+            kp_y + round((a[1] + b[1]) * 0.5 * lengthener)
+        )
+        display_points[i][2][0] = int(
+            kp_x + round((-1 * a[0] - b[0]) * 0.5 * lengthener)
+        )
+        display_points[i][2][1] = int(
+            kp_y + round((-1 * a[1] - b[1]) * 0.5 * lengthener)
+        )
+        display_points[i][1][0] = int(
+            kp_x + round((-1 * a[0] + b[0]) * 0.5 * lengthener)
+        )
+        display_points[i][1][1] = int(
+            kp_y + round((-1 * a[1] + b[1]) * 0.5 * lengthener)
+        )
+        display_points[i][3][0] = int(
+            kp_x + round((a[0] - b[0]) * 0.5 * lengthener)
+        )
+        display_points[i][3][1] = int(
+            kp_y + round((a[1] - b[1]) * 0.5 * lengthener)
+        )
+
+    ##### Sum unit cells
+    #  Gives averaged view of lattice
+    imgList = []
+    first = True
+    cropped_list = []
+
+    height, width, channels = orig_img.shape
+    for i in range(len(coordinates)):
+        mask = np.zeros(orig_img.shape[0:2], dtype=np.uint8)
+        points = np.array(display_points[i])
+        good_cell = True
+        for k in range(len(points)):
+            if (
+                points[k][0] < 0
+                or points[k][0] > width - 1
+                or points[k][1] < 0
+                or points[k][1] > height - 1
+            ):
+                good_cell = False
+        if good_cell:
+            cv.drawContours(mask, [points], -1, (255, 255, 255), -1, cv.LINE_AA)
+            res = orig_img
+
+            rect = cv.boundingRect(points)  # returns (x,y,w,h) of the rect
+            cropped = res[rect[1] : rect[1] + rect[3], rect[0] : rect[0] + rect[2]]
+            cropped = cv.cvtColor(cropped, cv.COLOR_BGR2GRAY)
+            cropped_list.append(cropped)
+
+            ## crate the white background of the same size of original image
+            wbg = np.ones_like(orig_img, np.uint8) * 255
+            cv.bitwise_not(wbg, wbg, mask=mask)
+            # overlap the resulted cropped image on the white background
+            dst = wbg + res
+
+            pil_im = Image.fromarray(cropped)
+            imgList.append(pil_im)
+
+            temp = np.asarray(cropped)
+            temp = temp.astype("uint32")
+            if first:
+                sumImage = temp
+                first = False
+            else:
+                sumImage = sumImage + temp
+
+
+    avgArray = sumImage / len(imgList)
+    avgImg = Image.fromarray(avgArray.astype("uint8"))
+    # avgImg.save("av_cropped.png")
+
+    fig = plt.figure()
+    plt.imshow(avgImg, cmap="inferno")
+    plt.tick_params(axis='both', which='both', bottom= False, top= False, labelbottom= False,
+                    right= False, left= False, labelleft= False)
+    plt.show()
+
+    cropped_list = np.array(cropped_list)
+    median_cropped = np.empty_like(cropped)
+
+    for i in range(len(cropped)):
+        for k in range(len(cropped[0])):
+            median_cropped[i][k] = np.median(cropped_list[:, i, k])
+
+    median_cropped = median_cropped.astype(np.int32)
+    medianImg = Image.fromarray(median_cropped.astype("uint8"))
+
+    fig = plt.figure()
+    plt.imshow(median_cropped, cmap="inferno")
+    plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False,
+                    right=False, left=False, labelleft=False)
+    plt.show()
+
+    width, height = avgImg.size
+    center = np.array([width/2, height/2])
+
+    return avgImg, medianImg, width, height
+
+
+def plot_symmetry_cell(avgImg, medianImg, width, height, a_vec, b_vec, symmetry_bool,
+                       lattice_construct, path, atomtypes, center_atom_cluster, corner_at_atomtype,
+                       corner_at_atomgroup_index):
+    
+    fig, ax = plt.subplots()
+    # To plot we need to invert y-axis
+    a_vec[1] = -a_vec[1]
+    b_vec[1] = -b_vec[1]
+
+    label = [["A", None, None, None], ["B", None, None, None], ["C", None, None, None]]
+    colors = ["tab:blue", "tab:orange"]
+    
+    sublattice_index_label = 0
+    for i in range(len(lattice_construct)):
+        self_trf_Index = 0
+        
+        for k in range(len(lattice_construct[i])):
+            plt.scatter(lattice_construct[i][k][0], -lattice_construct[i][k][1],
+                        label=sublattice_index_label, marker="o", s=300, edgecolors='black',
+                        zorder=20)
+            sublattice_index_label += 1
+
+    ax.legend()
+    #offset = [-lattice_construct[0][0][0], lattice_construct[0][0][1]] #tmp_var, unused
+    brillouin_zone_plot = np.array([a_vec*0, a_vec, a_vec + b_vec, b_vec, a_vec*0])
+    - np.array(lattice_construct[corner_at_atomtype][corner_at_atomgroup_index])
+    #- np.array([0.33*a_vec[0], 0.33*b_vec[1]])
+    
+    patch = patches.PathPatch(mpl.path.Path(brillouin_zone_plot), alpha=1, lw=5, zorder=5,
+                              facecolor='none', edgecolor="ghostwhite")
+
+    
+    ax.add_patch(patch)
+
+    plt.imshow(avgImg, cmap="inferno", extent=[-width/2., width/2., -height/2., height/2. ])
+    plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False,
+                    right=False, left=False, labelleft=False)
+
+    plt.savefig(path+"symmetry_cell_avg.svg", bbox_inches='tight', dpi=200)
+
+    plt.imshow(medianImg, cmap="inferno", extent=[-width/2., width/2., -height/2., height/2. ])
+    plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False,
+                    right=False, left=False, labelleft=False)
+
+    plt.savefig(path+"symmetry_cell_median.svg", bbox_inches='tight', dpi=200)
+    #a_vec[1] = -a_vec[1]
+    #b_vec[1] = -b_vec[1]
+    ############################################################
+
+
+    
 ###########START OF GRIDPLOT FUNCTIONS########################
 ##############################################################
 
@@ -337,6 +761,9 @@ def plot_grid(start, a, b, **kwargs):
     draw_periodic_lines(start, b, a, x_lim=x_lim, y_lim=y_lim, **kwargs)
     plt.legend()
 
+
+    
+    
     
 #### Old unused function
 def create_configfile(configfilepath,
