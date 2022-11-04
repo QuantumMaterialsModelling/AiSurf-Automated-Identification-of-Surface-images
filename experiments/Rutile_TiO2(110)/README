@@ -1,0 +1,3 @@
+To plot the median cell symmetry i needed to run separate calcualtions.
+The reason is that the calculations with parameters.ini give a good deviation plot but a bad symmetry prediction. 
+parameters_alt.ini do the opposite, and shows the cell shown in the paper.
