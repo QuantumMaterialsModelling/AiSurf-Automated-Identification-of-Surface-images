@@ -48,6 +48,103 @@ def find_best_clustering(descriptors, span, sklearn_clustering=AgglomerativeClus
     return best_labels
 
 
+def sublattice_lookup(x, x_lat, a, b, path, SUBLplot, possibleNoSubl):
+    '''
+    For each point x[i], search for nearest point x_lat[i]
+    and fold x[i] into unit cell of x_lat[i] with respect to lattice vectors a and b 
+    then cluster x's based on where they were folded to.
+    
+    Parameters:
+    ----------    
+    Input:
+    x - array(N,2). Points to be grouped into sublattice positions.
+    x_lat - array(M,2). Points that are known to lie on the lattice.
+    a,b - arrays. Lattice vectors coordinates.
+    path - string. Folder path relative to the notebook.
+    SUBLplot - boolean to decide wether or not to plot the sublattice positions.
+    possibleNoSubl - interval containing the optimal number of sublattice positions.
+    
+    Output:
+    subl - center of masses (COM) of clusters in unit cell.
+    subl_labels - for each input x, a label specifying the cluster it belongs to.
+    '''
+
+    #To speed up the following nearest neighbour look ups
+    #I arange the lattice points in a K-d-Tree
+    tree = sp.spatial.KDTree(x_lat,leafsize=6)
+
+    #lattice position of remaining x's when folded in the chosen unit cell:
+    x_fd = np.zeros(np.shape(x))
+    for i in range(np.shape(x)[0]):
+        #look up the nearest lattice point which isn't itself:
+        d,j = tree.query(x[i,:], k=6) #search the k-NN: d=distances, j=indices (arrays)
+        j = j[d>0.001] #shrinks the array with only meaningful elements
+        x_fd[i,:] = np.linalg.solve(np.array([a,b]).T, x[i,:]-x_lat[j[0],:])%1
+
+    print("Calculating distance matrix of folded back points ...")
+    d_matrix = sp.spatial.distance.cdist(x_fd, x_fd, lambda u,v: dist_per(u,v,a,b))
+    print("Done")
+
+    print("Clustering keypoints based on their position in the lattice that has been found",
+    "(i.e. sublattice found).")
+    subl_labels = find_best_clustering(d_matrix, span=possibleNoSubl,
+                                       affinity="precomputed", linkage="average")
+    
+    subl = np.array([COM(x_fd[subl_labels == i,:]) for i in set(subl_labels)])
+
+    if SUBLplot:
+        #transform all coordinates back to the original dimensions
+        x_fd2 = np.array([np.matmul(np.array([a,b]).T, x_fd[i,:]) 
+                          for i in range(np.shape(x_fd)[0])])
+        subl2 = np.array([np.matmul(np.array([a,b]).T, subl[i,:])
+                          for i in set(subl_labels)])
+        plt.figure(figsize=(8,8), dpi=80)
+        plt.axis("equal")
+        plt.gca().invert_yaxis()
+        plt.title("Sublattice positions")
+        plt.xlabel("x[px]")
+        plt.ylabel("y[px]")
+        for i in set(subl_labels):
+            plt.scatter(x_fd2[subl_labels==i, 0], x_fd2[subl_labels==i, 1], label=i)
+        plt.legend()
+        
+        plt.scatter(subl2[:,0], subl2[:,1])
+        plt.arrow(0, 0, a[0], a[1])
+        plt.arrow(0, 0, b[0], b[1])
+        plt.savefig(path+"sublattice_positions.svg")
+        plt.show()
+       
+    return subl, subl_labels
+
+
+def getXYSfromKPS(kps):
+    """
+    Get the attributes corresponding to x/y-coordinates and sizes of the keypoints kps.
+    
+    Parameters:
+    ----------
+    Input:
+    kps - tuple. Keypoints, obtained through cv2.xfeatures2d.SIFT_create(...).detect(...).
+    
+    Output:
+    x ,y, sizes - arrays. Coordinates and sizes of the keypoints.
+    """
+    n_kp = np.size(kps)
+    x = np.zeros(n_kp)
+    y = np.zeros(n_kp)
+    sizes = np.zeros(n_kp)
+    for i in range(n_kp):
+        x[i], y[i] = kps[i].pt
+        sizes[i] = kps[i].size
+    x ,y, sizes = np.array(x), np.array(y), np.array(sizes)
+    return x, y, sizes
+
+
+def unit_vector(vector):
+    """ Normalizes a given vector.  """
+    return vector / np.linalg.norm(np.array(vector))
+
+
 def dist_per(u, v, a, b):
     '''
     Calculates distances in a 1x1 unit cell with periodic boundary conditions.
@@ -116,9 +213,11 @@ def COM(x):
     COM[1] = ri*theta
     return COM
 
+
 def Rot_matrix(angle):
     c, s = np.cos(angle), np.sin(angle)
     return np.array(((c, -s), (s, c)))
+
 
 def Apply_PBC(a_vec, b_vec, point):
     basis_matrix = np.array([[a_vec[0], b_vec[0]], [a_vec[1], b_vec[1]]])
@@ -127,10 +226,6 @@ def Apply_PBC(a_vec, b_vec, point):
     trf[1] -= round(trf[1])
     return np.dot(basis_matrix, trf)
 
-def unit_vector(vector):
-    """ Normalizes a given vector.  """
-    return vector / np.linalg.norm(np.array(vector))
-
 
 def angle_between(v1, v2):
     """
@@ -138,8 +233,7 @@ def angle_between(v1, v2):
             >>> angle_between((1, 0, 0), (1, 0, 0))
             0.0
             >>> angle_between((1, 0, 0), (-1, 0, 0))
-            3.141592653589793
-            
+            3.141592653589793            
     Parameters:
     -----------
     Input:
@@ -152,16 +246,6 @@ def angle_between(v1, v2):
     v2_u = unit_vector(v2)
     angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     return angle
-
-
-def yes_or_no(question):
-    """ Poses a question to the user and waits for either a y/n """
-    while "the answer is invalid":
-        reply = str(input(question+' (y/n) ')).lower().strip()
-        if reply[0] == "y":
-            return True
-        if reply[0] == "n":
-            return False
 
 
 def get_filename_parts(inputfile):
@@ -186,29 +270,6 @@ def get_filename_parts(inputfile):
     fname = inputfile[fname_start+1:extension_start]
     extension = inputfile[extension_start:]
     return path, fname, extension
-
-
-def getXYSfromKPS(kps):
-    """
-    Get the attributes corresponding to x/y-coordinates and sizes of the keypoints kps.
-    
-    Parameters:
-    ----------
-    Input:
-    kps - tuple. Keypoints, obtained through cv2.xfeatures2d.SIFT_create(...).detect(...).
-    
-    Output:
-    x ,y, sizes - arrays. Coordinates and sizes of the keypoints.
-    """
-    n_kp = np.size(kps)
-    x = np.zeros(n_kp)
-    y = np.zeros(n_kp)
-    sizes = np.zeros(n_kp)
-    for i in range(n_kp):
-        x[i], y[i] = kps[i].pt
-        sizes[i] = kps[i].size
-    x ,y, sizes = np.array(x), np.array(y), np.array(sizes)
-    return x, y, sizes
 
 
 def get_correctGreyCmap(name):
@@ -306,8 +367,7 @@ def clusters_selector(kps, labels, chosen_labels): #not used anymore
             if labels[j] == i:
                 #del kps_filtered[j]
                 kps_filtered.append(kps[j])
-                labels_filtered.append(labels[j])
-                
+                labels_filtered.append(labels[j])                
     kps_filtered = tuple(kps_filtered)
     labels_filtered = np.array(labels_filtered)
             
@@ -481,37 +541,7 @@ def plot_lattice_deviations(x, a, b, subl_labels, k, rtol_rel, path,
     plt.scatter(diff[:,0], diff[:,1], s=1)
     plt.savefig(path+"deviations.svg")
     plt.show()    
-    
-    
-def DensityClustering(x, rtol, mins=3):
-    '''
-    Use DBSCAN algorithm to cluster a (potentially noisy) list of vectors.
 
-    Parameters:
-    ----------
-    Input:
-    x - array. Keypoint's coordinates.
-    rtol - float. Distance measure used for the DBSCAN clustering.
-    mins - integer. Minimum amount of samples to form cluster in DBSCAN.
-
-    Output:
-    unique - array with shape (k, 2). Average coordinates of the k-nearest-neighbors.
-    labels - array. Contains the label of each computed NN distance.
-    '''
-    N, m = np.shape(x)
-    clustering = DBSCAN(eps = rtol, min_samples = mins).fit(x)
-    labels = clustering.labels_
-
-    unique = np.array([])
-    for i in set(labels):
-        if i != -1:
-            unique = np.append(unique, np.average(x[labels==i,:], axis=0))
-    unique = unique.reshape((np.size(unique)//m,m))
-    
-    return unique, labels
-
-
-# Average cell-rrlated functions
 
 def average_cell(img, a, b, x, subl_labels, center_atom_cluster, lengthener):
     '''
@@ -524,37 +554,20 @@ def average_cell(img, a, b, x, subl_labels, center_atom_cluster, lengthener):
 
     orig_img = img
     coordinates = x[subl_labels == center_atom_cluster]
-
     display_points = np.zeros((len(coordinates), 4, 2)).tolist()  # Only for plotting
 
     for i in range(len(coordinates)):
         kp_x = int(round(coordinates[i][0]))
         kp_y = int(round(coordinates[i][1]))
 
-        display_points[i][0][0] = int(
-            kp_x + round((a[0] + b[0]) * 0.5 * lengthener)
-        )
-        display_points[i][0][1] = int(
-            kp_y + round((a[1] + b[1]) * 0.5 * lengthener)
-        )
-        display_points[i][2][0] = int(
-            kp_x + round((-1 * a[0] - b[0]) * 0.5 * lengthener)
-        )
-        display_points[i][2][1] = int(
-            kp_y + round((-1 * a[1] - b[1]) * 0.5 * lengthener)
-        )
-        display_points[i][1][0] = int(
-            kp_x + round((-1 * a[0] + b[0]) * 0.5 * lengthener)
-        )
-        display_points[i][1][1] = int(
-            kp_y + round((-1 * a[1] + b[1]) * 0.5 * lengthener)
-        )
-        display_points[i][3][0] = int(
-            kp_x + round((a[0] - b[0]) * 0.5 * lengthener)
-        )
-        display_points[i][3][1] = int(
-            kp_y + round((a[1] - b[1]) * 0.5 * lengthener)
-        )
+        display_points[i][0][0] = int(kp_x + round((a[0] + b[0]) * 0.5 * lengthener))
+        display_points[i][0][1] = int(kp_y + round((a[1] + b[1]) * 0.5 * lengthener))
+        display_points[i][2][0] = int(kp_x + round((-1 * a[0] - b[0]) * 0.5 * lengthener))
+        display_points[i][2][1] = int(kp_y + round((-1 * a[1] - b[1]) * 0.5 * lengthener))
+        display_points[i][1][0] = int(kp_x + round((-1 * a[0] + b[0]) * 0.5 * lengthener))
+        display_points[i][1][1] = int(kp_y + round((-1 * a[1] + b[1]) * 0.5 * lengthener))
+        display_points[i][3][0] = int(kp_x + round((a[0] - b[0]) * 0.5 * lengthener))
+        display_points[i][3][1] = int(kp_y + round((a[1] - b[1]) * 0.5 * lengthener))
 
     ##### Sum unit cells
     #  Gives averaged view of lattice
@@ -621,22 +634,17 @@ def average_cell(img, a, b, x, subl_labels, center_atom_cluster, lengthener):
 
     median_cropped = median_cropped.astype(np.int32)
     medianImg = Image.fromarray(median_cropped.astype("uint8"))
-
-    fig = plt.figure()
-    plt.imshow(median_cropped, cmap="inferno")
-    plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False,
-                    right=False, left=False, labelleft=False)
-    plt.show()
-
     width, height = avgImg.size
     center = np.array([width/2, height/2])
 
     return avgImg, medianImg, width, height
 
-
 def plot_symmetry_cell(avgImg, medianImg, width, height, a_vec, b_vec, symmetry_bool,
                        lattice_construct, path, atomtypes, center_atom_cluster, corner_at_atomtype,
                        corner_at_atomgroup_index):
+    '''
+    Currently unused, and older version too. Instead there are a few lines in the notebook.
+    '''
     
     fig, ax = plt.subplots()
     # To plot we need to invert y-axis
@@ -687,7 +695,6 @@ def plot_symmetry_cell(avgImg, medianImg, width, height, a_vec, b_vec, symmetry_
     
 ###########START OF GRIDPLOT FUNCTIONS########################
 ##############################################################
-
 def draw_line(start, a, x_lim = [0,1], y_lim=[0,1], **kwargs):
     '''
     Tries to draw a line in a box defined by x_lim and y_lim,
@@ -728,11 +735,11 @@ def draw_line(start, a, x_lim = [0,1], y_lim=[0,1], **kwargs):
     else:
         return 1
 
-    
+
 def draw_periodic_lines(starting_point, line_direction, separation_vector, x_lim = [0,1],
                         y_lim = [0,1], **kwargs):
     '''
-    Used in utilities.py only.
+    Used in utilities.py, only for plot_grid.
     '''
     starting_point = np.asarray(starting_point)
     line_direction = np.asarray(line_direction)
@@ -752,7 +759,7 @@ def draw_periodic_lines(starting_point, line_direction, separation_vector, x_lim
         
 def plot_grid(start, a, b, **kwargs):
     '''
-    Used in utilities.py only.
+    Used to plot the grid over the original image.
     '''
     plt.plot(start[0], start[1], 'bo', label="origin")
     x_lim = np.sort(plt.xlim())
@@ -760,74 +767,3 @@ def plot_grid(start, a, b, **kwargs):
     draw_periodic_lines(start, a, b, x_lim=x_lim, y_lim=y_lim, **kwargs)
     draw_periodic_lines(start, b, a, x_lim=x_lim, y_lim=y_lim, **kwargs)
     plt.legend()
-
-
-    
-    
-    
-#### Old unused function
-def create_configfile(configfilepath,
-                        inputfile,                               # Input
-                        cThr, sigma, nOctLayers,                 # SIFT
-                        size_Threshold, edge_Threshold,          # Keypoint filtering
-                        clustering_span_kp,                      # Keypoint Clustering
-                        k1,                                      # Nearest Neighbours 1
-                        cluster_span_kNN, clustersize_Threshold, # Nearest Neighbours Clustering
-                        clustering_span_SUBL,                    # Sublattice lookup
-                        k2, rtol_rel, arrow_width):              # Deviation plot
-    '''
-    Takes all the parameters that go into creating a complete
-    experiment and creates a config file that can then be
-    taken to recreate the experiment.
-    '''
-    conf = configparser.ConfigParser(allow_no_value = True)
-    conf.add_section('Input')
-    conf['Input'] = {'inputfile' : inputfile}
-
-    conf.add_section('SIFT')
-    conf['SIFT'] =                 {';SIFT parameters are well explained in:':None,
-                                    '; https://docs.opencv.org/3.4.9/d5/d3c/classcv_1_1xfeatures2d_1_1SIFT.html':None,
-                                    'contrast_threshold'     : cThr,
-                                    'sigma'                  : sigma,
-                                    'nOctaveLayers'          : nOctLayers}
-    conf.add_section('Keypoint filtering')
-    conf['Keypoint filtering'] =   {';These are thresholds to filter out keypoints that could get in the way of the method':None,
-                                    ';Both are in units of the median keypoint size':None,
-                                    ';All keypoints that are bigger than median*size_Threshold are deleted':None,
-                                    ';All keypoints that are closer than median*edge_Threshold to one border of the image are deleted':None,
-                                    'size_Threshold'         : size_Threshold,
-                                    'edge_Threshold'         : edge_Threshold}
-    conf.add_section('Keypoint Clustering')
-    conf['Keypoint Clustering'] =  {';Clusterings with n Clusters between lower and upper bound are evaluated wrt their silhouette score':None,
-                                    ';The one with the maximal silhouette score is chosen for further processing':None,
-                                    'nClusters_lower_bound'  : clustering_span_kp[0],
-                                    'nClusters_upper_bound'  : clustering_span_kp[-1]+1}
-    conf.add_section('Nearest Neighbours')
-    conf['Nearest Neighbours'] =   {';number_of_NN should be self explanatory (NN stands for nearest neighbours':None,
-                                    ';usually to get a good clustering of the NN distribution lower bound should be set to k1':None,
-                                    ';and upper bound to k1*4':None,
-                                    ';clustersize_Threshold is used to reduce impact of erroneous NN-vectors on the selection of the lattice vectors':None,
-                                    ';in the final distribution only NN-clusters with members N>=clustersize_Threshold*N_max are considered':None,
-                                    ';Usually clustersize_Threshold is set to 0.3':None,
-                                    'number_of_NN'           : k1,
-                                    'nClusters_lower_bound'  : cluster_span_kNN[0],
-                                    'nClusters_upper_bound'  : cluster_span_kNN[-1]+1,
-                                    'clustersize_Threshold'  : clustersize_Threshold}
-    conf.add_section('Sublattice lookup')
-    conf['Sublattice lookup'] =    {';Clustering parameters for the sublattice distribution':None,
-                                    'nClusters_lower_bound'  : clustering_span_SUBL[0],
-                                    'nClusters_upper_bound'  : clustering_span_SUBL[-1]+1}
-    conf.add_section('Deviation plot')
-    conf['Deviation plot'] =       {';For the final deviation plot nearest Neighbours are calculated wrt to all keypoints':None,
-                                    ';not just for the (presumably regular) keypoint cluster with most number of keypoints':None,
-                                    ';therefore it is usually better to chose k2 bigger than k1':None,
-                                    ';All vectors that are within the relative_r-Tolerance of the lattice vectors are drawn':None,
-                                    ';The arrow_width can also be specified here (see matplotlib.quiver() - width parameter)':None,
-                                    ';It is in units of the plot width (usual value 0.005)':None,
-                                    'number_of_NN'           : k2,
-                                    'relative_r-Tolerance'   : rtol_rel,
-                                    'arrow_width'            : arrow_width}
-    with open(configfilepath,'w') as cfile:
-        conf.write(cfile)
-        cfile.close()
-    
