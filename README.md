@@ -1,7 +1,7 @@
-# LYRE: *L*attice s*Y*mmetry *RE*cognition
+# AiSurf:*A*utomated *I*dentification of *S*urface images
 
-LYRE is a tool which aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) + Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
-The main advantage of LYRE is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with an overall calculation time of approximately 30-60 seconds.  No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed.
+AiSurf is a tool which aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) + Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
+The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with an overall calculation time of approximately 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed.
 
 ## Installation
 No installation is needed, the user just needs to download this repository.
@@ -11,20 +11,21 @@ No installation is needed, the user just needs to download this repository.
 * SciPy
 * Scikit-learn (sklearn)
 * Python Image Library (PIL)
+* OpenCV
 
 
 ## Usage
 ### General setup
 In order to start the lattice recognition process, image and simulation parameters need to be set. This can be done in the following way:
-* Create a folder where image, parameters file and results will be stored. In this repository, such folders are inside the [experiments](https://github.com/MarcoCrr/Lattice-symmetry-recognition/tree/master/experiments) folder;
-* Specify the path and the image name at the beginning of the IPython notebook [lattice_extraction.ipynb](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/lattice_extraction.ipynb). For example, the third cell of the notebook reads: <br>
+* Create a folder where image, parameters file and results will be stored. In this repository, such folders are inside the [experiments](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments) folder;
+* Specify the path (relative to the notebook) and the image name at the beginning of the IPython notebook [lattice_extraction.ipynb](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/lattice_extraction.ipynb). For example, the third cell of the notebook reads: <br>
 ```
 # Insert path + filename here:
-path = "experiments/small SrTiO3_1244/"
+path = "experiments/SrTiO3(001)/"
 filename = "small SrTiO3_1244.png"
 ```
 ### Parameters file setup
-The parameters file, *parameters.ini* is the file which contains all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be set; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameters tuning are inserted in appropriate locations of the Notebook.
+The parameters file, *parameters.ini* is the file which contains all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be set; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameters tuning are inserted in the Notebook, just before they are used.
 
 [*SIFT*] <br>
 Three fundamental parameters of the SIFT algorithm, well explained in the [original article](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) by Lowe and in [this link](https://docs.opencv.org/4.5.4/d7/d60/classcv_1_1SIFT.html).
@@ -44,9 +45,9 @@ Clusterings with *n* clusters between lower and upper bound are evaluated with r
 
 [*Nearest Neighbours*] <br>
 Parameters related to the clustering processes used to find the primitive vectors.
-- **cluster_kNN_low** and **cluster_kNN_high**: values defining the interval containing the optimal number of clusters for the calculated NN distances, evaluated by the silhouette score. *Default: 6 and 24 respectively*; they define the variable *cluster_span_kNN*. <br>
-**cluster_kNN_low** is also the number of nearest neighbors considered for each keypoint during these calulations.
-- **clustersize_Threshold**: used to reduce impact of erroneous nn-vectors on the selection of the lattice vectors. In the final distribution only nn-clusters with population ≥ clustersize_threshold\*n_max are considered; n_max here is the population of the largest cluster; *Default: 0.3*.
+- **cluster_kNN_low** and **cluster_kNN_high**: values defining the interval containing the optimal number of clusters for the calculated nearest neighbours (NN) distances, evaluated by the silhouette score. *Default: 6 and 24 respectively*; they define the variable *cluster_span_kNN*. <br>
+**cluster_kNN_low** is also the number of NN considered for each keypoint during the calculations.
+- **clustersize_Threshold**: used to reduce impact of erroneous NN-vectors on the selection of the lattice vectors. In the final distribution only nn-clusters with population ≥ clustersize_threshold\*n_max are considered; n_max here is the population of the largest cluster; *Default: 0.3*.
 
 [*Sublattice lookup*] <br>
 Once the primitive vectors have been found, we look for the sublattice positions.
@@ -55,7 +56,7 @@ Once the primitive vectors have been found, we look for the sublattice positions
 [*Deviation plot*] <br>
 Parameters related to the perfect-lattice-deviations plot.
 - **k2**: number of nearest neighbors considered for each keypoint. *Default: 10*;
-- **rtol_rel**: all vectors that are within the relative_r-tolerance of the lattice vectors are drawn; *Default: 4*;
+- **rtol_rel**: all vectors that are within the relative_r-tolerance of the lattice vectors are drawn; *Default: 4* (pixels);
 - **arrow_width**: the arrow_width can be specified (see [matplotlib.quiver() - width parameter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html)). *Default: 0.003*;
 - **c_max_arrow**: deviation (in pixels) of a lattice vector with respect to the predicted one. Needed to tune the visualization of bond deviations, purely aesthetic. *Default: None*.
 
@@ -65,10 +66,10 @@ Parameters related to the perfect-lattice-deviations plot.
 ## Example
 SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-![clean_kp](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_cleankp.png)
+![clean_kp](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png)
 <br> Nearest neighbours distances folded into the unit cell: <br>
-![sublattice_pos](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/sublattice_positions.svg)
+![sublattice_pos](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.svg)
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-![deviations](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_deviations.svg)
+![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments/SrTiO3(001)/deviations_1.svg)
 <br> Final prediction of the cell symmetry: <br>
-![symmetry](https://github.com/MarcoCrr/Lattice-symmetry-recognition/blob/master/experiments/small_SrTiO3_1244/example_cell_symmetry.svg)
+![symmetry](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.svg)
