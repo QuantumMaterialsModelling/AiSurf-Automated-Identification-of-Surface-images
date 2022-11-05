@@ -1,7 +1,8 @@
-# AiSurf:*A*utomated *I*dentification of *S*urface images
+# AiSurf:*A*utomated *I*dentification of *Surf*ace images
 
 AiSurf is a tool which aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) + Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
-The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with an overall calculation time of approximately 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed.
+The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with an overall calculation time of approximately 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed. <br>
+AiSurf extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
 
 ## Installation
 No installation is needed, the user just needs to download this repository.
@@ -70,6 +71,6 @@ Keypoints localization after cleaning: <br>
 <br> Nearest neighbours distances folded into the unit cell: <br>
 ![sublattice_pos](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.svg)
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments/SrTiO3(001)/deviations_1.svg)
+![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.svg)
 <br> Final prediction of the cell symmetry: <br>
 ![symmetry](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.svg)
