@@ -4,6 +4,11 @@ AiSurf is a tool which aims to inspect and classify atomically-resolved images (
 The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with an overall calculation time of approximately 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed. <br>
 AiSurf extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
 
+
+## Cite our work
+We kindly ask the user to cite [AiSurf's related article](https://iopscience.iop.org/article/10.1088/2632-2153/acb5e0/meta) when using it for their scientific research.
+
+
 ## Installation
 No installation is needed, the user just needs to download this repository.
 ### Dependencies
@@ -60,7 +65,6 @@ Parameters related to the perfect-lattice-deviations plot.
 - **rtol_rel**: all vectors that are within the relative_r-tolerance of the lattice vectors are drawn; *Default: 4* (pixels);
 - **arrow_width**: the arrow_width can be specified (see [matplotlib.quiver() - width parameter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html)). *Default: 0.003*;
 - **c_max_arrow**: deviation (in pixels) of a lattice vector with respect to the predicted one. Needed to tune the visualization of bond deviations, purely aesthetic. *Default: None*.
-
 
 
 
