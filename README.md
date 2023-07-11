@@ -1,7 +1,7 @@
 # AiSurf: *A*utomated *I*dentification of *Surf*ace images
 
 AiSurf is a tool which aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
-The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with an overall calculation time of approximately 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed. <br>
+The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with a typical calculation time of 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed. <br>
 AiSurf extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
 
 
@@ -32,10 +32,10 @@ path = "experiments/SrTiO3(001)/"
 filename = "small SrTiO3_1244.png"
 ```
 ### Parameters file setup
-The parameters file, *parameters.ini* is the file which contains all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be set; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameters tuning are inserted in the Notebook, just before they are used.
+The parameters file, *parameters.ini* is the file containing all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be used instead; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameter tuning are inserted in the Notebook, just before they are used. Images in the [experiments](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments) folder of this repository can also be used as a reference for parameter tuning.
 
 [*SIFT*] <br>
-Three fundamental parameters of the SIFT algorithm, well explained in the [original article](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) by Lowe and in [this link](https://docs.opencv.org/4.5.4/d7/d60/classcv_1_1SIFT.html).
+Three main parameters of the SIFT algorithm, well explained in the [original article](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) by Lowe and in [this link](https://docs.opencv.org/4.5.4/d7/d60/classcv_1_1SIFT.html).
 - **contrast_threshold**: the contrast threshold used to filter out weak features. Higher threshold means more discarded features. *Default: 0.003*;
 - **sigma**: the sigma of the Gaussian applied to the input image at the first octave. *Default: 4*;
 - **noctavelayers**: the number of layers in each octave. The number of octaves is computed automatically from the image resolution. *Default: 8*.
@@ -54,7 +54,7 @@ Clusterings with *n* clusters between lower and upper bound are evaluated with r
 Parameters related to the clustering processes used to find the primitive vectors.
 - **cluster_kNN_low** and **cluster_kNN_high**: values defining the interval containing the optimal number of clusters for the calculated nearest neighbours (NN) distances, evaluated by the silhouette score. *Default: 6 and 24 respectively*; they define the variable *cluster_span_kNN*. <br>
 **cluster_kNN_low** is also the number of NN considered for each keypoint during the calculations.
-- **clustersize_Threshold**: used to reduce impact of erroneous NN-vectors on the selection of the lattice vectors. In the final distribution only nn-clusters with population ≥ clustersize_threshold\*n_max are considered; n_max here is the population of the largest cluster; *Default: 0.3*.
+- **clustersize_Threshold**: used to reduce impact of erroneous NN-vectors on the selection of the lattice vectors. In the final distribution only nn-clusters with population ≥ clustersize_threshold\*n_max are considered; n_max is the population of the largest cluster; *Default: 0.3*.
 
 [*Sublattice lookup*] <br>
 Once the primitive vectors have been found, we look for the sublattice positions.
