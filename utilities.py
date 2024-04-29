@@ -48,6 +48,86 @@ def find_best_clustering(descriptors, span, sklearn_clustering=AgglomerativeClus
     return best_labels
 
 
+def find_lattice_vectors(x, path, cluster_kNN_low, cluster_kNN_high,
+                        clustersize_Threshold):
+    '''
+    Finds the lattice vectors from the selected cluster elements' coordinates.
+    x - cluster elements' coordinates.
+    Better docstring not available yet.
+    '''
+
+    kNN = kNearestNeighbours(x, cluster_kNN_low)
+
+    plt.figure(figsize=(4,4), dpi=150)
+    plt.axis("equal")
+    plt.gca().invert_yaxis()
+    plt.grid()
+    plt.scatter(kNN[:,0], kNN[:,1], s=1, alpha=0.2)
+    plt.xlabel("x [px]")
+    plt.ylabel("y [px]")
+    plt.savefig(path+"NNV_original.svg")
+    plt.show()
+
+    kNN_posX = np.array([-kNN[i,:] if kNN[i,0]<0 else
+                        kNN[i,:] for i in range(np.shape(kNN)[0])])
+    print("Clustering NNV's of maximally represented feature class:")
+    kNN_labels = find_best_clustering(kNN_posX,
+                            span=range(cluster_kNN_low, cluster_kNN_high))
+
+    #The potential lattice vectors are the average vectors of each cluster:
+    average_peaks = np.array(
+        [np.average(kNN_posX[kNN_labels==l,:], axis=0) for l in set(kNN_labels)])
+
+    # Filter out small clusters, probably noise-derived.
+    clustersizes = np.array([len(kNN_labels[kNN_labels==i]) for i in range(max(kNN_labels)+1)])
+    max_clustersize = np.max(clustersizes)
+    average_peaks = average_peaks[clustersizes>=max_clustersize*clustersize_Threshold,:]
+    labels_AP=np.arange(
+                max(set(kNN_labels))+1)[clustersizes>=max_clustersize*clustersize_Threshold]
+
+    # Find primitive lattice vectors
+    sorted_ind = np.argsort(np.linalg.norm(average_peaks, axis=1))
+    average_peaks = np.take_along_axis(
+                                    average_peaks,
+                                    sorted_ind.repeat(2).reshape(np.shape(average_peaks)),
+                                    axis=0)
+    labels_AP = np.take_along_axis(labels_AP, sorted_ind, axis=0)
+
+    found = False
+    for i in range(np.shape(average_peaks)[0]):
+        if found == True: break  
+        for j in range(i+1, np.shape(average_peaks)[0]):
+            if np.abs(np.cos(angle_between(average_peaks[i,:],
+                                                    average_peaks[j,:])))<0.95:
+                a = average_peaks[i,:]
+                b = average_peaks[j,:]
+                cluster_a = labels_AP[i]
+                cluster_b = labels_AP[j]
+                found = True
+                break
+    if found==False:
+        print("Something went wrong ... a,b not found")
+  
+    std_a = np.std(kNN_posX[kNN_labels==cluster_a,:], axis=0)
+    std_b = np.std(kNN_posX[kNN_labels==cluster_b,:], axis=0)
+
+    print("Primitive vectors coordinates:")
+    print("a = ({:6.2f} +/-{:5.2f},{:6.2f} +/-{:5.2f})\n\
+           b = ({:6.2f} +/-{:5.2f},{:6.2f} +/-{:5.2f})".\
+    format(a[0], std_a[0], a[1], std_a[1], b[0], std_b[0], b[1], std_b[1]))
+
+
+    plt.figure(figsize=(4,4), dpi=150)
+    plot_clustered_NNVs(kNN_posX, kNN_labels, average_peaks, a, b)
+    plt.xlabel("x [px]")
+    plt.ylabel("y [px]")
+    plt.grid()
+    plt.savefig(path+"NNV_1cluster.svg")
+    plt.show()
+
+    return a, b
+
+
 def sublattice_lookup(x, x_lat, a, b, path, SUBLplot, possibleNoSubl):
     '''
     For each point x[i], search for nearest point x_lat[i]
@@ -427,7 +507,7 @@ def plot_clustered_NNVs(kNN_right, kNN_labels, kNN_red, a, b):
     plt.axis("equal")
     plt.gca().invert_yaxis()
     for i in set(kNN_labels):
-        plt.scatter(kNN_right[kNN_labels == i,0],kNN_right[kNN_labels == i,1],s = 2,label=str(i))
+        plt.scatter(kNN_right[kNN_labels == i,0],kNN_right[kNN_labels == i,1],s = 2,label=str(i), alpha=0.2)
     plt.scatter(kNN_red[:,0],kNN_red[:,1],label = "reduced",s = 4)
     plt.arrow(0,0,a[0],a[1])
     plt.arrow(0,0,b[0],b[1])
@@ -447,7 +527,7 @@ def plot_lattice_deviations(x, a, b, subl_labels, k, rtol_rel, path,
     plt.axis("equal")
     plt.gca().invert_yaxis()
     plt.title('NN to consider in the deviation plot')
-    plt.scatter(kNN[:,0], kNN[:,1], s=1)
+    plt.scatter(kNN[:,0], kNN[:,1], s=1, alpha=0.2)
     ax = plt.gca()
     ax.add_patch(patches.Circle(a, radius=rtol_rel, fill=False, color=(0,0,0)))
     ax.add_patch(patches.Circle(b, radius=rtol_rel, fill=False, color=(0,0,0)))
