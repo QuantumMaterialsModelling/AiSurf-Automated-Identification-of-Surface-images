@@ -57,6 +57,7 @@ def find_lattice_vectors(x, path, cluster_kNN_low, cluster_kNN_high,
     '''
 
     kNN = kNearestNeighbours(x, cluster_kNN_low)
+    kNN = kNN[kNN[:,0]>0] # hard filtering, they are symmetrical points
 
     plt.figure(figsize=(4,4), dpi=150)
     plt.axis("equal")
@@ -68,8 +69,9 @@ def find_lattice_vectors(x, path, cluster_kNN_low, cluster_kNN_high,
     plt.savefig(path+"NNV_original.svg")
     plt.show()
 
-    kNN_posX = np.array([-kNN[i,:] if kNN[i,0]<0 else
-                        kNN[i,:] for i in range(np.shape(kNN)[0])])
+    # kNN_posX = np.array([-kNN[i,:] if kNN[i,0]<0 else                 #OLD
+    #                     kNN[i,:] for i in range(np.shape(kNN)[0])])
+    kNN_posX = np.array([kNN[i,:] for i in range(np.shape(kNN)[0])])
     print("Clustering NNV's of maximally represented feature class:")
     kNN_labels = find_best_clustering(kNN_posX,
                             span=range(cluster_kNN_low, cluster_kNN_high))
@@ -389,11 +391,16 @@ def plot_clusters(img, kps, labels, colormap='jet', **kwargs):
     ax = plt.gca()
     plt.imshow(img, cmap=get_correctGreyCmap("Grey_cmap"), vmin=0, vmax=255)
     
-    for i in range(len(set(labels))):
+    for i in set(labels):
         c = np.array(cmap(i))
-        for k in range(np.size(kps)):
-            if labels[k]==i:
-                ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
+        kp_lab = np.where(labels==i)[0]
+        for k in kp_lab:
+            ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, fill=False))
+    # for i in range(len(set(labels))): #OLD
+    #     c = np.array(cmap(i))
+    #     for k in range(np.size(kps)): # loop not needed? just filter the coordinates
+    #         if labels[k]==i:
+    #             ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
 
                 
 def plot_one_cluster(img, kps, labels, cluster_label, colormap="jet",**kwargs):
@@ -419,9 +426,12 @@ def plot_one_cluster(img, kps, labels, cluster_label, colormap="jet",**kwargs):
     plt.imshow(img, cmap=get_correctGreyCmap("Grey_cmap"), vmin=0, vmax=255)
     ax = plt.gca()
     c = np.array(cmap(cluster_label))
-    for k in range(np.size(kps)):
-        if labels[k]==cluster_label:
-            ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
+    kp_lab = np.where(labels==cluster_label)[0]
+    for k in kp_lab:
+        ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
+    # for k in range(np.size(kps)): #OLD
+    #     if labels[k]==cluster_label:
+    #         ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
 
 
 def clusters_selector(kps, labels, chosen_labels): #not used anymore
@@ -467,7 +477,7 @@ def kNearestNeighbours(x, k, eps=0):
     k - int. Number of nearest neighbors to calculate the difference vectors.
 
     Output:
-    KNN - array with shape (len(x)*k,2). Distances of the k-nearest-neighbours from any x[i].
+    KNN - array with shape (len(x)*k, 2). Distances of the k-nearest-neighbours from any x[i].
     '''
     N,m = np.shape(x)
     if k >= N:
@@ -564,7 +574,8 @@ def plot_lattice_deviations(x, a, b, subl_labels, k, rtol_rel, path,
         diff = np.append(diff, kNN[is_minus_a & kNNofSubl,:]+a)
         diff_magn = np.zeros(np.shape(kNN[to_draw,:])[0])
         
-        for i in range(np.shape(kNN[to_draw,:])[0]):
+        for i in range(np.shape(kNN[to_draw,:])[0]): # optimization: I can merge the two loops, just add the ifs.
+                                                     # check quiv1, might need some other work too.
             if (is_a[to_draw])[i]:
                 diff_magn[i] = np.linalg.norm((kNN[to_draw,:])[i,:]-a)
             elif (is_minus_a[to_draw])[i]:
