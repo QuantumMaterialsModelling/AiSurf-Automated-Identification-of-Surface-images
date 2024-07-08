@@ -169,8 +169,7 @@ def sublattice_lookup(x, x_lat, a, b, path, SUBLplot, possibleNoSubl):
 
     print("Clustering keypoints based on their position in the lattice that has been found",
     "(i.e. sublattice found).")
-    subl_labels = find_best_clustering(d_matrix, span=possibleNoSubl,
-                                       affinity="precomputed", linkage="average")
+    subl_labels = find_best_clustering(d_matrix, span=possibleNoSubl, linkage="average")
     
     subl = np.array([COM(x_fd[subl_labels == i,:]) for i in set(subl_labels)])
 
@@ -396,11 +395,6 @@ def plot_clusters(img, kps, labels, colormap='jet', **kwargs):
         kp_lab = np.where(labels==i)[0]
         for k in kp_lab:
             ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, fill=False))
-    # for i in range(len(set(labels))): #OLD
-    #     c = np.array(cmap(i))
-    #     for k in range(np.size(kps)): # loop not needed? just filter the coordinates
-    #         if labels[k]==i:
-    #             ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
 
                 
 def plot_one_cluster(img, kps, labels, cluster_label, colormap="jet",**kwargs):
@@ -429,9 +423,6 @@ def plot_one_cluster(img, kps, labels, cluster_label, colormap="jet",**kwargs):
     kp_lab = np.where(labels==cluster_label)[0]
     for k in kp_lab:
         ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
-    # for k in range(np.size(kps)): #OLD
-    #     if labels[k]==cluster_label:
-    #         ax.add_patch(mpl.patches.Circle((x[k],y[k]), radius=sizes[k], color=c, **kwargs))
 
 
 def clusters_selector(kps, labels, chosen_labels): #not used anymore
@@ -858,3 +849,65 @@ def plot_grid(start, a, b, **kwargs):
     draw_periodic_lines(start, a, b, x_lim=x_lim, y_lim=y_lim, **kwargs)
     draw_periodic_lines(start, b, a, x_lim=x_lim, y_lim=y_lim, **kwargs)
     plt.legend()
+
+
+
+
+###################################################
+
+# ATOM COUNTING - related functions
+
+###################################################
+
+
+def segmentation(img, erosion=True):
+    '''
+    Performa a binary segmentation of the image using Otsu's method.
+    
+    Parameters:
+    -------------------------------------
+    img: ndarray. Image to be segmented.
+    erosion: boolean. Perform or not an erosion to the input image.
+             Usually doing it with a 3x3 kernel is enough for a smooth segmentation.
+
+    Returns:
+    -------------------------------------
+    thresh: float. The threshold extracted with Otsu's method, in pixels.
+    binary_img: ndarray. Binary image used as a mask, to separate the two domains.
+    segm_img0. ndarray. Shows the pixels assigned to the white domain ('0'), with black background.
+    segm_img1. ndarray. Shows the pixels assigned to the black domain ('1'), with black background.
+    '''
+
+    if erosion==True:
+        # Creating kernel
+        kernel = np.ones((3, 3), np.uint8)
+        # Using cv2.erode() method 
+        img = cv.erode(img, kernel)
+    
+    print('Image shape:', img.shape)
+    M, N = img.shape
+    flattened_image = img.flatten()
+
+    thresh, binary_img = cv.threshold(img, 0, 255, cv.THRESH_BINARY+cv.THRESH_OTSU)
+    print("Found threshold:", thresh)
+
+    binary_img_tmp = (binary_img/255).flatten().tolist()
+    count0 = binary_img_tmp.count(0)
+    count1 = binary_img_tmp.count(1)
+    print("Group 0 (white):", round(count0/len(flattened_image)*100, 2),"%" )
+    print("Group 1 (black):", round(count1/len(flattened_image)*100, 2),"%" )
+
+    binary_img = binary_img.flatten() #/255
+    segm_img0 = np.zeros(binary_img.shape, dtype=int)
+    segm_img1 = np.zeros(binary_img.shape, dtype=int)
+
+    segm_img0ind = (binary_img==0)
+    segm_img0[segm_img0ind] = flattened_image[segm_img0ind]
+    segm_img1[np.invert(segm_img0ind)] = flattened_image[np.invert(segm_img0ind)]
+
+    segm_img0 = segm_img0.reshape(img.shape)
+    segm_img1 = segm_img1.reshape(img.shape)
+    binary_img = binary_img.reshape(img.shape)
+
+
+    return thresh, binary_img, segm_img0, segm_img1
