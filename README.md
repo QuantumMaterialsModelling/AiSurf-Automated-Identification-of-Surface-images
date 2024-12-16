@@ -81,17 +81,17 @@ Parameters related to the perfect-lattice-deviations plot.
 ### Example - Lattice Extraction
 SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-[//]: # (this is a comment in Markdown...)
-[//]: # ( ![clean_kp](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png) )
+[//]: <> (this is a comment in Markdown...)
+[//]: <> ( ![clean_kp](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png) )
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png" width="300" height="300">
 <br> Nearest neighbours distances folded into the unit cell: <br>
-[//]: # ( ![sublattice_pos](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png) )
+[//]: <> ( ![sublattice_pos](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png) )
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png" width="300" height="300">
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-[//]: # ( ![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png) )
+[//]: <> ( ![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png) )
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png" width="300" height="300">
 <br> Final prediction of the cell symmetry: <br>
-[//]: # ( ![symmetry](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png) )
+[//]: <> ( ![symmetry](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png) )
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png"  width="200" height="200">
 
 
@@ -111,5 +111,5 @@ Other than the [parameters](#parameters_lattice_extr) introduced for Lattice Ext
 
 ### Example - Atom Counting
 See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/experiments/atom_counting).
-[//]: # ( ![counting](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png) )
+[//]: <> ( ![counting](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png) )
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
