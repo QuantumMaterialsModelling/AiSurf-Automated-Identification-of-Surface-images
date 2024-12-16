@@ -1,17 +1,26 @@
 # AiSurf: *A*utomated *I*dentification of *Surf*ace images
+AiSurf is an open-source package for analizing surface microscopy images. New functionalities are added with time.
+The main advantage of AiSurf is that it exploits unsupervised techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. No programming skills are required to use this tool, only the istructions written in the *Usage* sections of the respective notebooks need to be followed. <br>
 
-AiSurf is a tool which aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
-The main advantage of AiSurf is that it exploits unsupervised machine learning techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. It can be executed by office computers/laptops with a typical calculation time of 30-60 seconds. No programming skills are required to use this tool, only the istructions written in the [Usage](#usage) section need to be followed. <br>
-AiSurf extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
+These are the current available methods: <br>
+*Lattice Extraction* aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
+Lattice Extraction extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
+
+*Atom Counting* allows to count features on images through a template-matching procedure. It is a natural extension of Lattice Extraction and it is typically used to count atoms on surface images.
 
 
-## Cite our work
-We kindly ask the user to cite [AiSurf's related article](https://iopscience.iop.org/article/10.1088/2632-2153/acb5e0/meta) when using this code for their scientific research. <br>
-*Marco Corrias et al 2023 Mach. Learn.: Sci. Technol. 4 015015,* **DOI:** *10.1088/2632-2153/acb5e0*
+## Related works
+We kindly ask the user to cite the articles relative to AiSurf's functionalities when using them for their scientific research.
+
+[Lattice Extraction related article](https://iopscience.iop.org/article/10.1088/2632-2153/acb5e0/meta).<br>
+*Marco Corrias et al 2023 Mach. Learn.: Sci. Technol. 4 015015,* **DOI:** *10.1088/2632-2153/acb5e0* <br>
+
+[Atom Counting related article](https://pubs.acs.org/doi/10.1021/acsami.4c13795).<br>
 
 
 ## Installation
 No installation is needed, the user just needs to download this repository.
+
 ### Dependencies
 * NumPy
 * Matplotlib
@@ -21,17 +30,18 @@ No installation is needed, the user just needs to download this repository.
 * OpenCV
 
 
-## Usage
+## Usage - Lattice Extraction {#usage_lattice_extr}
 ### General setup
-In order to start the lattice recognition process, image and simulation parameters need to be set. This can be done in the following way:
+In order to start the lattice recognition process, image and simulation parameters need to be set. This can be done in the following ways:
 * Create a folder where image, parameters file and results will be stored. In this repository, such folders are inside the [experiments](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments) folder;
 * Specify the path (relative to the notebook) and the image name at the beginning of the IPython notebook [lattice_extraction.ipynb](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/lattice_extraction.ipynb). For example, the third cell of the notebook reads: <br>
 ```
 # Insert path + filename here:
-path = "experiments/SrTiO3(001)/"
+path = "experiments/lattice_extraction/SrTiO3(001)/"
 filename = "small SrTiO3_1244.png"
 ```
-### Parameters file setup
+
+### Parameters file setup {#parameters_lattice_extr}
 The parameters file, *parameters.ini* is the file containing all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be used instead; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameter tuning are inserted in the Notebook, just before they are used. Images in the [experiments](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments) folder of this repository can also be used as a reference for parameter tuning.
 
 [*SIFT*] <br>
@@ -68,14 +78,38 @@ Parameters related to the perfect-lattice-deviations plot.
 - **c_max_arrow**: deviation (in pixels) of a lattice vector with respect to the predicted one. Needed to tune the visualization of bond deviations, purely aesthetic. *Default: None*.
 
 
-
-## Example
+### Example - Lattice Extraction
 SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-![clean_kp](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png)
+[//]: # (this is a comment in Markdown...)
+[//]: # ( ![clean_kp](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png) )
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png" width="300" height="300">
 <br> Nearest neighbours distances folded into the unit cell: <br>
-![sublattice_pos](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png)
+[//]: # ( ![sublattice_pos](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png) )
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png" width="300" height="300">
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png)
+[//]: # ( ![deviations](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png) )
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png" width="300" height="300">
 <br> Final prediction of the cell symmetry: <br>
-![symmetry](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png)
+[//]: # ( ![symmetry](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png) )
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png"  width="200" height="200">
+
+
+---
+
+
+## Usage - Atom Counting
+Refer to the [Usage](#usage_lattice_extr) section of Lattice Extraction.
+
+### Parameters file setup
+Other than the [parameters](#parameters_lattice_extr) introduced for Lattice Extraction, new ones have been introduced.
+
+[*Atom count*] <br>
+- **r_rescale**: rescales the median features' radius. Used to variate the impact of the atomic neighborhood on the correlation map. Recommended value: between 0.8 and 1.2.
+- **min_correl**: filter out the peaks below this value from the correlation map. Use to reduce the outliers from the peak detection/atom counting. Recommended value: between 0.4 and 0.6.
+- **d_rescale**: recales the accepted minimum distance between the features, which is equal to half of the median crop's size. The features' filtering process takes care of most of the outliers, and the default value of 0.8 never needed to be modified.
+
+### Example - Atom Counting
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/experiments/atom_counting).
+[//]: # ( ![counting](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png) )
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
