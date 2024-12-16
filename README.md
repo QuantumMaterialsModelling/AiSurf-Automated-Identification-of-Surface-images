@@ -105,5 +105,5 @@ Other than the [parameters](#parameters_lattice_extr) introduced for Lattice Ext
 - **d_rescale**: recales the accepted minimum distance between the features, which is equal to half of the median crop's size. The features' filtering process takes care of most of the outliers, and the default value of 0.8 never needed to be modified.
 
 ### Example - Atom Counting
-See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/experiments/atom_counting).
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/experiments/atom_counting). <br>
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
