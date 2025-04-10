@@ -18,6 +18,9 @@ We kindly ask the user to cite the articles relative to AiSurf's functionalities
 [Atom Counting related article](https://pubs.acs.org/doi/10.1021/acsami.4c13795).<br>
 
 
+More features coming soon! <br>
+
+
 ## Installation
 No installation is needed, the user just needs to download this repository.
 
@@ -30,19 +33,19 @@ No installation is needed, the user just needs to download this repository.
 * OpenCV
 
 
-## Usage - Lattice Extraction {#usage_lattice_extr}
+## <a name="usage_lattice_extr"></a> Usage - Lattice Extraction
 ### General setup
 In order to start the lattice recognition process, image and simulation parameters need to be set. This can be done in the following ways:
-* Create a folder where image, parameters file and results will be stored. In this repository, such folders are inside the [experiments](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments) folder;
+* Create a folder where image, parameters file and results will be stored. In this repository, such folders are inside the [examples](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/examples) folder;
 * Specify the path (relative to the notebook) and the image name at the beginning of the IPython notebook [lattice_extraction.ipynb](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/lattice_extraction.ipynb). For example, the third cell of the notebook reads: <br>
 ```
 # Insert path + filename here:
-path = "experiments/lattice_extraction/SrTiO3(001)/"
+path = "examples/lattice_extraction/SrTiO3(001)/"
 filename = "small SrTiO3_1244.png"
 ```
 
-### Parameters file setup {#parameters_lattice_extr}
-The parameters file, *parameters.ini* is the file containing all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be used instead; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameter tuning are inserted in the Notebook, just before they are used. Images in the [experiments](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/experiments) folder of this repository can also be used as a reference for parameter tuning.
+### <a name="parameters_lattice_extr"></a> Parameters file setup
+The parameters file, *parameters.ini* is the file containing all the parameters needed to run the simulation. It must be put inside the image folder, but if not provided some default parameters will be used instead; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; suggestions regarding the parameter tuning are inserted in the Notebook, just before they are used. Images in the [examples](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/examples) folder of this repository can also be used as a reference for parameter tuning.
 
 [*SIFT*] <br>
 Three main parameters of the SIFT algorithm, well explained in the [original article](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) by Lowe and in [this link](https://docs.opencv.org/4.5.4/d7/d60/classcv_1_1SIFT.html).
@@ -81,13 +84,13 @@ Parameters related to the perfect-lattice-deviations plot.
 ### Example - Lattice Extraction
 SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above: <br>
 Keypoints localization after cleaning: <br>
-<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/example_cleankp.png" width="300" height="300">
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/example_cleankp.png" width="300" height="300">
 <br> Nearest neighbours distances folded into the unit cell: <br>
-<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/sublattice_positions.png" width="300" height="300">
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/sublattice_positions.png" width="300" height="300">
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
-<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/deviations_1.png" width="300" height="300">
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/deviations_1.png" width="300" height="300">
 <br> Final prediction of the cell symmetry: <br>
-<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/experiments/SrTiO3(001)/symmetry_cell_average.png"  width="200" height="200">
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/symmetry_cell_average.png"  width="200" height="200">
 
 
 ---
@@ -105,5 +108,5 @@ Other than the [parameters](#parameters_lattice_extr) introduced for Lattice Ext
 - **d_rescale**: recales the accepted minimum distance between the features, which is equal to half of the median crop's size. The features' filtering process takes care of most of the outliers, and the default value of 0.8 never needed to be modified.
 
 ### Example - Atom Counting
-See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/experiments/atom_counting). <br>
-<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/experiments/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/atom_counting). <br>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
