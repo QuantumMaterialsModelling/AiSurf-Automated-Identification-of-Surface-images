@@ -3,14 +3,14 @@ AiSurf is an open-source package for analizing surface microscopy images. New fu
 The main advantage of AiSurf is that it doesn't require any image database for training, which is a bottleneck for many image classification programs. No programming skills are required to use this tool, only the istructions written in the *Usage* sections of the respective notebooks need to be followed. <br>
 
 **These are the current available methods:** <br>
-*Lattice Extraction* aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
+1. *Lattice Extraction* aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
 Lattice Extraction extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
 
-*Atom Counting* allows to count features on images through a template-matching procedure. It is a natural extension of Lattice Extraction and it is typically used to count atoms on surface images.
+2. *Atom Counting* allows to count features on images through a template-matching procedure. It is a natural extension of Lattice Extraction and it is typically used to count atoms on surface images.
 
-*QuasiCrystal Pattern Extractor (QCP)* extracts the tiles from images displaying quasicristalline patterns. The tiling along with a statistical analysis can be obtained.
+3. *QuasiCrystal Pattern Extractor (QCP)* extracts the tiles from images displaying quasicristalline patterns. The tiling along with a statistical analysis can be obtained.
 
-*Total Variation decomposition* allows to smooth, decompose or denoise (microscopy) images using total variation minimization techniques.
+4. *Total Variation decomposition* allows to smooth, decompose or denoise (microscopy) images using total variation minimization techniques.
 
 
 ## Related works
@@ -24,9 +24,6 @@ We kindly ask the user to cite the articles relative to AiSurf's functionalities
 [Quasicristalline pattern recognition related article](https://arxiv.org/abs/2503.05472). (under revision) <br>
 
 [Total Variation decomposition](xxx). (under submission, link soon available.) <br>
-
-
-More features coming soon! <br>
 
 
 ## Installation
@@ -92,7 +89,7 @@ Parameters related to the perfect-lattice-deviations plot.
 
 ### Example - Lattice Extraction
 SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above.
-See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/lattice_extraction/) for more informations and examples. <br>
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/lattice_extraction/) for more informations (e.g. parameters setting) and examples. <br>
 Keypoints localization after cleaning: <br>
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/example_cleankp.png" width="300" height="300">
 <br> Nearest neighbours distances folded into the unit cell: <br>
@@ -118,7 +115,7 @@ Other than the [parameters](#parameters_lattice_extr) introduced for Lattice Ext
 - **d_rescale**: recales the accepted minimum distance between the features, which is equal to half of the median crop's size. The features' filtering process takes care of most of the outliers, and the default value of 0.8 never needed to be modified.
 
 ### Example - Atom Counting
-See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/atom_counting) for more informations and examples. <br>
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/atom_counting) for more informations (e.g. parameters setting) and examples. <br>
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
 
 
@@ -206,7 +203,7 @@ where runs can be set arbitrarily high, as the algorithm stops when no more miss
 
 
 ### Example - Quasicrystalline pattern extractor
-See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)) for more informations. <br>
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)) for more informations (e.g. parameters setting). <br>
 <p float="left">
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tiles.png" width="300" height="300"/>
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_NN.png" width="300" height="300"/>
@@ -217,12 +214,12 @@ See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Au
 ---
 
 
-## <a name="usage_qcp"></a> Usage - TV decomposition {#TV_decomp}
+## <a name="usage_qcp"></a> Usage - TV decomposition
 ### General setup
 In order to start processing the image(s), the simulation parameters need to be set. This can be done in the following way:
 * create a *param_dn.ini* file and store it in the same folder of *denoising.ipynb*. *param_dn.ini* contains the relative path and the name of the image(s) to be processed, and all the other parameters involved in the workflow. <br>
 
-### Parameters file setup {#parameters_TV}
+### Parameters file setup
 The parameters file, *param_dn_.ini* is the file containing all the parameters needed to run the simulation. If some parameters are not provided some default ones will be used instead; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; examples of parameters settings can be found in the code's repository.
 
 [*files*] <br>
@@ -243,4 +240,11 @@ The parameters file, *param_dn_.ini* is the file containing all the parameters n
 
 
 ### Example - Total Variation Decomposition
-Insert param.ini and an example, like Mica or LSMO.
+
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/total_variation_decomposition) for more informations (e.g. parameters setting) ad examples. <br>
+
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/LSMO110.png" width="1052" height="700"/>
+<p float="left">
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/Mica/Mica_02007_countBlack.png" width="350" height="350"/>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/Mica/Mica_02007_countBlack_hROF_nabla-both_it500_lam0.5_alpha0.05_median.png" width="350" height="350"/>
+</p>
