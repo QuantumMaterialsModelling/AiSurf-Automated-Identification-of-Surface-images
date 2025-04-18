@@ -10,6 +10,8 @@ Lattice Extraction extracts primitive lattice vectors, unit cells, and structura
 
 *QuasiCrystal Pattern Extractor (QCP)* extracts the tiles from images displaying quasicristalline patterns. The tiling along with a statistical analysis can be obtained.
 
+*Total Variation decomposition* allows to smooth, decompose or denoise (microscopy) images using total variation minimization techniques.
+
 
 ## Related works
 We kindly ask the user to cite the articles relative to AiSurf's functionalities when using them for their scientific research.
@@ -21,12 +23,17 @@ We kindly ask the user to cite the articles relative to AiSurf's functionalities
 
 [Quasicristalline pattern recognition related article](https://arxiv.org/abs/2503.05472). (under revision) <br>
 
+[Total Variation decomposition](xxx). (under submission, link soon available.) <br>
+
 
 More features coming soon! <br>
 
 
 ## Installation
 No installation is needed, the user just needs to download this repository.
+
+
+## <a name="usage_lattice_extr"></a> Usage - Lattice Extraction
 
 ### Dependencies
 * NumPy
@@ -36,8 +43,6 @@ No installation is needed, the user just needs to download this repository.
 * Python Image Library (PIL)
 * OpenCV
 
-
-## <a name="usage_lattice_extr"></a> Usage - Lattice Extraction
 ### General setup
 In order to start the lattice recognition process, image and simulation parameters need to be set. This can be done in the following ways:
 * Create a folder where image, parameters file and results will be stored. In this repository, such folders are inside the [examples](https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/tree/master/examples) folder;
@@ -101,7 +106,7 @@ Keypoints localization after cleaning: <br>
 ---
 
 
-## Usage - Atom Counting
+## <a name="usage_atom_counting"></a>Usage - Atom Counting
 Refer to the [Usage](#usage_lattice_extr) section of Lattice Extraction.
 
 ### Parameters file setup
@@ -205,5 +210,37 @@ See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Au
 <p float="left">
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tiles.png" width="300" height="300"/>
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_NN.png" width="300" height="300"/>
-<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tilecount.png" width="270" height="200"/>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tilecount.png" width="300" height="220"/>
 </p>
+
+
+---
+
+
+## <a name="usage_qcp"></a> Usage - TV decomposition {#TV_decomp}
+### General setup
+In order to start processing the image(s), the simulation parameters need to be set. This can be done in the following way:
+* create a *param_dn.ini* file and store it in the same folder of *denoising.ipynb*. *param_dn.ini* contains the relative path and the name of the image(s) to be processed, and all the other parameters involved in the workflow. <br>
+
+### Parameters file setup {#parameters_TV}
+The parameters file, *param_dn_.ini* is the file containing all the parameters needed to run the simulation. If some parameters are not provided some default ones will be used instead; such parameters are found at the beginning of the IPython Notebook file. This section will describe the meaning of each parameter; examples of parameters settings can be found in the code's repository.
+
+[*files*] <br>
+- **path**: folder path relative to the notebook where the raw image is stored;
+- **filename**: filename: name of the image(s) to be processed;
+- **extension**; file extension.
+
+[*parameters*] <br>
+- **iterations**: maximun number of iterations before the calculations stop (in case of convergence problems). *Default*: 2000.
+- **err**: root mean square error between the input and output image, below which the calculations stop and the convergence is reached. *Default*: 5E-6.
+- **nabla_comp**: components of the gradient operator to be considered. *both*: isotropic calculations; used when scratches or other artifacts imaged as parallel lines are not present od are not wanted to be removed. *x*: considers only horizontal components. Needed when horizontal lines need to be removed, as the vertical signal jumps they lead to are removed. *y*: considers only the vertical gradient components. Used when unwanted, vertical lines are present. *Default*: *both*.
+- **algo**: which method to use. 1 - TV-L1, 2 - Huber-ROF, 3 TGV-L1. *Default*: *2 (Huber-ROF)*.
+- **lam**: value of the lambda parameter. *Default*: 0.01.
+- **alpha**: value of the alpha parameter in the Huber-ROF method. *Default*: 0.05.
+- **alpha1 and alpha2**: values of the alpha1 and alpha2 parameters in the TGV-L1 method. *Default*: 1, 2 respectively.
+- **gif_yn**: True or False, whether one wants to generate a frame for a gif every 100 iterations. *Default*: False.
+
+
+
+### Example - Total Variation Decomposition
+Insert param.ini and an example, like Mica or LSMO.
