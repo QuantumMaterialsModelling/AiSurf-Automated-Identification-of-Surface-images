@@ -203,7 +203,7 @@ where runs can be set arbitrarily high, as the algorithm stops when no more miss
 ### Example - Quasicrystalline pattern extractor
 See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)) for more informations. <br>
 <p float="left">
-<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tiles.png" width="300" height="300"/>
-<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_NN.png" width="300" height="300"/>
-<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tilecount.png" width="270" height="200"/>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tiles.png" width="300" height="300"/>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_NN.png" width="300" height="300"/>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/quasicrystalline_pattern_recognition/Ba-Ti-O_Pt(111)/Ba-Ti-O_Pt(111)_tilecount.png" width="270" height="200"/>
 </p>
