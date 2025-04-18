@@ -1,12 +1,14 @@
 # AiSurf: *A*utomated *I*dentification of *Surf*ace images
 AiSurf is an open-source package for analizing surface microscopy images. New functionalities are added with time.
-The main advantage of AiSurf is that it exploits unsupervised techniques, so it doesn't require any image database for training, which is a bottleneck for many image classification programs. No programming skills are required to use this tool, only the istructions written in the *Usage* sections of the respective notebooks need to be followed. <br>
+The main advantage of AiSurf is that it doesn't require any image database for training, which is a bottleneck for many image classification programs. No programming skills are required to use this tool, only the istructions written in the *Usage* sections of the respective notebooks need to be followed. <br>
 
-These are the current available methods: <br>
+**These are the current available methods:** <br>
 *Lattice Extraction* aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
 Lattice Extraction extracts primitive lattice vectors, unit cells, and structural distortions from the original image, with no pre-assumption on the lattice and minimal user intervention.
 
 *Atom Counting* allows to count features on images through a template-matching procedure. It is a natural extension of Lattice Extraction and it is typically used to count atoms on surface images.
+
+*QuasiCrystal Pattern Extractor (QCP)* extracts the tiles from images displaying quasicristalline patterns. The tiling along with a statistical analysis can be obtained.
 
 
 ## Related works
@@ -16,6 +18,8 @@ We kindly ask the user to cite the articles relative to AiSurf's functionalities
 *Marco Corrias et al 2023 Mach. Learn.: Sci. Technol. 4 015015,* **DOI:** *10.1088/2632-2153/acb5e0* <br>
 
 [Atom Counting related article](https://pubs.acs.org/doi/10.1021/acsami.4c13795).<br>
+
+[Quasicristalline pattern recognition related article](https://arxiv.org/abs/2503.05472). (under revision) <br>
 
 
 More features coming soon! <br>
@@ -82,7 +86,8 @@ Parameters related to the perfect-lattice-deviations plot.
 
 
 ### Example - Lattice Extraction
-SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above: <br>
+SrTiO3 (001) with Sr vacancies, calculated with the default parameters written above.
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/lattice_extraction/) for more informations and examples. <br>
 Keypoints localization after cleaning: <br>
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/example_cleankp.png" width="300" height="300">
 <br> Nearest neighbours distances folded into the unit cell: <br>
@@ -108,5 +113,88 @@ Other than the [parameters](#parameters_lattice_extr) introduced for Lattice Ext
 - **d_rescale**: recales the accepted minimum distance between the features, which is equal to half of the median crop's size. The features' filtering process takes care of most of the outliers, and the default value of 0.8 never needed to be modified.
 
 ### Example - Atom Counting
-See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/atom_counting). <br>
+See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/atom_counting) for more informations and examples. <br>
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/atom_counting/small_SrTiO3_1244/count147.png" width="300" height="300">
+
+
+---
+
+
+## <a name="usage_qcp"></a> Usage - QuasiCrystal Pattern Extractor (QCP)
+
+This module was made for a generalized pattern recognition in atomic resolution images of quasicrystal surfaces. 
+It is simple to use, needing only a few lines to recognize quasiperiodic patterns (if any are present) as found in quasicrystals, while also
+offering a wide range of customizability (as explained in the "Application" section).
+Along the tiling, it also detects atom locations, rotational symmetry and the individual tile quantities. 
+
+
+### Dependencies
+ - Numpy
+ - Matplotlib
+ - OpenCV
+ - Pillow (PIL)
+ - SciPy
+ - Scikit-learn
+
+
+### Path setup
+The easiest way to open an image is to declare the path to the folder and state the filename of the image.  
+```
+path = ".../imagefolder/"
+filename = "image.png"
+```
+
+### Parameter setup
+
+If certain class instance parameters are to be changed, it is good to have a *parameters.ini* file in the same folder of the image. It will automatically be considered when the path is given.
+The following parameters may be changed in the *parameters.ini* file:
+
+[*SIFT*] <br>
+- **c_thr:** The contrast threshold value for the image features. Lowering this means that more image features with a low contrast change relative to the surrounding are discarded.;
+- **e_thr:** A threshold for discarding features along edges. Higher threshold means less edge detections.;
+- **sigma:** Sigma of the initial Gaussian that is convolved with the image.;
+- **n_oct_layers:** The number of layers per octave. Increasing this leads to more keypoint detections, useful for multiple smaller features. 
+
+[*Keypoint filtering*] <br>
+- **size_threshold:** Keypoints with sizes >(median size*size_threshold) are discarded. Keypoints with sizes <(median_size/size_threshold) are discarded as well.;
+- **edge_threshold:** Keypoints too close to the edge are discarded. The distance to the center of the keypoint from the edge must be <(median size*edge_threshold).;
+- **shrink_factor:** Remaining keypoint sizes are set to shrink_factor*median size. This shifts the importance in the descriptors to the central gradient.
+
+[*Nearest Neighbours*] <br>
+- **kNN_amount:** How many neighbours should be consided during the nearest neighbour search.
+
+For more info on SIFT parameters, see [here](https://www.cs.ubc.ca/~lowe/papers/iccv99.pdf)
+
+### Instance initialization
+
+Upon loading the module and setting the path and filename, a class instance can be created using
+
+```
+qcp = QCP.QCP(path=path, filename=filename)
+```
+
+### Performing the recognition
+
+A practical example can be followed in the Python notebook. <br>
+The initial tiling computation can be performed with
+
+```
+qcp.compute()
+```
+
+Upon completion, the tiling can be displayed by passing
+
+```
+fig, ax = plt.subplots()
+qcp.plot_all_tiles(ax)
+```
+
+### Filling in missing points
+
+As SIFT struggles with some detections, it is good to employ the point search algorithm by using
+
+```
+qcp.fill_and_compute(runs=1)
+```
+
+where runs can be set arbitrarily high, as the algorithm stops when no more missing points can be found. The final tiling can then be displayed using the method shown above again. 
