@@ -243,7 +243,8 @@ The parameters file, *param_dn_.ini* is the file containing all the parameters n
 
 See the [Examples folder](https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/tree/master/examples/total_variation_decomposition) for more informations (e.g. parameters setting) ad examples. <br>
 
-<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/LSMO110.png" width="1052" height="700"/>
+<img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/LSMO110.png" width="700" height="467"/>
+Before / After:
 <p float="left">
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/Mica/Mica_02007_countBlack.png" width="350" height="350"/>
 <img src="https://github.com/QuantumMaterialsModelling/AiSurf-Automated-Identification-of-Surface-images/blob/master/examples/total_variation_decomposition/Mica/Mica_02007_countBlack_hROF_nabla-both_it500_lam0.5_alpha0.05_median.png" width="350" height="350"/>
