@@ -1,6 +1,13 @@
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/AiSurf_logo4final.png" 
+        alt="Picture" 
+        width="300" 
+        height="300" 
+        style="display: block; margin: 0 auto" />
+
+
 # AiSurf: *A*utomated *I*dentification of *Surf*ace images
-AiSurf is an open-source package for analizing surface microscopy images. New functionalities are added with time.
-The main advantage of AiSurf is that it doesn't require any image database for training, which is a bottleneck for many image classification programs. No programming skills are required to use this tool, only the istructions written in the *Usage* sections of the respective notebooks need to be followed. <br>
+AiSurf is an open-source package for analyzing surface microscopy images. New functionalities are added with time.
+The main advantage of AiSurf is that it doesn't require any image database for training, which is a bottleneck for many image classification programs. No programming skills are required to use this tool, only the instructions written in the *Usage* sections of the respective notebooks need to be followed. <br>
 
 **These are the current available methods:** <br>
 1. *Lattice Extraction* aims to inspect and classify atomically-resolved images (like AFM and STM) via Scale Invariant Feature Transform [(SIFT)](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) and Clustering Algorithms, inspired by the work of [Laanait et al](https://ascimaging.springeropen.com/articles/10.1186/s40679-016-0028-8). <br>
@@ -21,9 +28,9 @@ We kindly ask the user to cite the articles relative to AiSurf's functionalities
 
 [Atom Counting related article](https://pubs.acs.org/doi/10.1021/acsami.4c13795).<br>
 
-[Quasicristalline pattern recognition related article](https://arxiv.org/abs/2503.05472). (under revision) <br>
+[Quasicristalline pattern recognition related article](https://arxiv.org/abs/2503.05472). (accepted) <br>
 
-[Total Variation decomposition](xxx). (under submission, link soon available.) <br>
+[Total Variation decomposition](https://arxiv.org/abs/2505.08843v1). (under revision) <br>
 
 
 ## Installation
@@ -60,7 +67,7 @@ Three main parameters of the SIFT algorithm, well explained in the [original art
 - **noctavelayers**: the number of layers in each octave. The number of octaves is computed automatically from the image resolution. *Default: 8*.
 
 [*Keypoint filtering*] <br>
-These are thresholds to filter out [keypoints](https://paperswithcode.com/task/keypoint-detection) ("kp") that could cause issues in the lattice identification process, in units of the median keypoint size.
+These are thresholds to filter out [keypoints](https://paperswithcode.com/task/keypoint-detection) ("kp") that could cause issues in the lattice identification process, in units of the median keypoint diameter (here called *median*).
 - **size_threshold**: if kp_size > median*size_threshold or kp_size < median/size_threshold the keypoint is deleted. *Default: 2*;
 - **edge_threshold**: all keypoints that are closer than median\*edge_threshold to one border of the image are deleted. *Default: 1*.
 
@@ -97,7 +104,7 @@ Keypoints localization after cleaning: <br>
 <br> Arrows connecting Sr atoms, with colours based on their deviation from the primitive vector: <br>
 <img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/deviations_1.png" width="300" height="300">
 <br> Final prediction of the cell symmetry: <br>
-<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/symmetry_cell_average.png"  width="200" height="200">
+<img src="https://github.com/QuantumMaterialsModelling/Lattice-Symmetry-Recognition/blob/master/examples/lattice_extraction/SrTiO3(001)/symmetry_cell_average.png"  width="250" height="250">
 
 
 ---
