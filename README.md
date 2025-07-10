@@ -27,8 +27,11 @@ We kindly ask the user to cite the articles relative to AiSurf's functionalities
 *Marco Corrias et al 2023 Mach. Learn.: Sci. Technol. 4 015015,* **DOI:** *10.1088/2632-2153/acb5e0* <br>
 
 [Atom Counting related article](https://pubs.acs.org/doi/10.1021/acsami.4c13795).<br>
+Aji Alexander, Michele Reticcioli, Llorenç Albons, Jesús Redondo, Marco Corrias, Igor Píš, Zhichang Wang, Viktor Johánek, Josef Mysliveček, Cesare Franchini, Dominik Wrana, and Martin Setvin
+ACS Applied Materials & Interfaces 2024 16 (50), 70010-70019 <br>
 
-[Quasicristalline pattern recognition related article](https://arxiv.org/abs/2503.05472). (accepted) <br>
+[Quasicristalline pattern recognition related article](https://doi.org/10.1002/aidi.202500043). <br>
+Kender, T.K., Corrias, M. and Franchini, C. (2025), Automatic Determination of Quasicrystalline Patterns from Microscopy Images. Advanced Intelligent Discovery 202500043. <br>
 
 [Total Variation decomposition](https://arxiv.org/abs/2505.08843v1). (under revision) <br>
 
